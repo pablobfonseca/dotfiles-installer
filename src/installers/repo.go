@@ -1,28 +1,27 @@
 package dotfiles
 
 import (
-	"fmt"
 	"os"
 	"path"
 
-	utils "github.com/pablobfonseca/dotfiles-cli/src"
+	"github.com/pablobfonseca/dotfiles-cli/src/utils"
 	"github.com/vbauerster/mpb/v7"
-	"github.com/vbauerster/mpb/v7/decor"
 )
 
 func CloneRepo(p *mpb.Progress) {
-	bar := p.AddBar(100,
-		mpb.PrependDecorators(
-			decor.Name("Cloning repository", decor.WC{W: len("Cloning") + 1, C: decor.DidentRight}),
-		),
-		mpb.AppendDecorators(
-			decor.OnComplete(decor.EwmaETA(decor.ET_STYLE_GO, 60), "done"),
-		),
-	)
+	bar := utils.NewBar("Cloning dotfiles repo", 1, p)
 
-	if err := utils.ExecuteCommand("git", "clone", "https://github.com/pablobfonseca/dotfiles.git", path.Join(os.Getenv("HOME"), ".dotfiles")); err != nil {
-		fmt.Println("Error cloning the repository:", err)
-		return
+	if err := utils.ExecuteCommand("git", "clone", utils.DotfilesRepo, path.Join(os.Getenv("HOME"), ".dotfiles")); err != nil {
+		utils.ErrorMessage("Error cloning the repository", err)
 	}
-	bar.Increment() // 100 % since cloning is done
+	bar.Increment()
+}
+
+func DeleteRepo(p *mpb.Progress) {
+	bar := utils.NewBar("Deleting dotfiles repo", 1, p)
+
+	if err := utils.ExecuteCommand("rm", "-rf", path.Join(os.Getenv("HOME"), ".dotfiles")); err != nil {
+		utils.ErrorMessage("Error deleting the repository", err)
+	}
+	bar.Increment()
 }
