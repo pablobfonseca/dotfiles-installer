@@ -23,17 +23,16 @@ func InstallEmacs(p *mpb.Progress) {
 
 	}
 
-	if utils.DirExists(emacsConfigPath) {
-		utils.SkipMessage("Emacs folder already exists")
-		return
-	}
+	utils.CloneRepoIfNotExists()
 
-	cloningBar := utils.NewBar("Cloning emacs files", 1, p)
-	utils.InfoMessage("Emacs directory does not exists, cloning...")
-	if err := utils.ExecuteCommand("git", "clone", "https://github.com/pablobfonseca/emacs.d", emacsConfigPath); err != nil {
-		utils.ErrorMessage("Error cloning the repository", err)
+	symlinkBar := utils.NewBar("Symlinking files", 1, p)
+
+	src := path.Join(utils.DotfilesPath, "emacs.d")
+	dest := path.Join(emacsConfigPath)
+	if err := os.Symlink(src, dest); err != nil {
+		utils.ErrorMessage("Error creating symlink", err)
 	}
-	cloningBar.Increment()
+	symlinkBar.Increment()
 }
 
 func UninstallEmacs(p *mpb.Progress) {

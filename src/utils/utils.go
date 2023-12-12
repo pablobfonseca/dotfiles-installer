@@ -5,9 +5,11 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
+	"path"
 )
 
 var DotfilesRepo = "https://github.com/pablobfonseca/dotfiles.git"
+var DotfilesPath = path.Join(os.Getenv("HOME"), ".dotfiles")
 
 func CommandExists(command string) bool {
 	_, err := exec.LookPath(command)
