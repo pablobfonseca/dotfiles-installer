@@ -5,11 +5,7 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
-	"path"
 )
-
-var DotfilesRepo = "https://github.com/pablobfonseca/dotfiles.git"
-var DotfilesPath = path.Join(os.Getenv("HOME"), ".dotfiles")
 
 func CommandExists(command string) bool {
 	_, err := exec.LookPath(command)
@@ -25,7 +21,7 @@ func DirExists(path string) bool {
 	return info.IsDir()
 }
 
-func ExecuteCommand(command string, args ...string) error {
+func ExecuteCommand(verbose bool, command string, args ...string) error {
 	var stdoutBuf, stderrBuf bytes.Buffer
 	cmd := exec.Command(command, args...)
 	cmd.Stdout = &stdoutBuf
@@ -33,7 +29,13 @@ func ExecuteCommand(command string, args ...string) error {
 	err := cmd.Run()
 
 	if err != nil {
-		fmt.Println("Error executing command:", err)
+		fmt.Printf("Error executing command: %s %v | %v\n", command, args, err)
+		if verbose {
+			fmt.Println("Command output:", stderrBuf.String())
+		}
+	}
+
+	if verbose {
 		fmt.Println("Command output:", stdoutBuf.String())
 	}
 

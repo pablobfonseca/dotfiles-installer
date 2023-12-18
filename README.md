@@ -1,14 +1,14 @@
-# dotfiles-cli
+# dotfiles CLI
 
 This is my personal [dotfiles](https://github.com/pablobfonseca/dotfiles.git) installer
 
 ## Getting started
 ```shell
-$ dotfiles-cli
-dotfiles-cli is a CLI tool to install dotfiles from a git repository.
+$ dotfiles
+dotfiles is a CLI tool to install dotfiles from a git repository.
 
 Usage:
-  dotfiles-cli [command]
+  dotfiles [command]
 
 Available Commands:
   completion  Generate the autocompletion script for the specified shell
@@ -18,8 +18,8 @@ Available Commands:
   update      Update the dotfiles
 
 Flags:
-  -h, --help     help for dotfiles-cli
+  -h, --help     help for dotfiles
   -t, --toggle   Help message for toggle
 
-Use "dotfiles-cli [command] --help" for more information about a command.
+Use "dotfiles [command] --help" for more information about a command.
 ```

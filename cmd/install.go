@@ -7,7 +7,7 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/vbauerster/mpb/v7"
 
-	dotfiles "github.com/pablobfonseca/dotfiles-cli/src/installers"
+	dotfiles "github.com/pablobfonseca/dotfiles/src/installers"
 )
 
 var installCmd = &cobra.Command{
@@ -29,10 +29,10 @@ var installCmd = &cobra.Command{
 			installAll(p)
 		}
 		if nvim {
-			dotfiles.InstallNvim(p)
+			dotfiles.InstallNvim(p, verbose)
 		}
 		if emacs {
-			dotfiles.InstallEmacs(p)
+			dotfiles.InstallEmacs(p, verbose)
 		}
 		if zsh {
 			dotfiles.InstallZsh(p)
@@ -43,11 +43,11 @@ var installCmd = &cobra.Command{
 }
 
 func installAll(p *mpb.Progress) {
-	dotfiles.CloneRepo(p)
-	dotfiles.InstallHomebrew(p)
-	dotfiles.InstallNvim(p)
+	dotfiles.CloneRepo(p, verbose)
+	dotfiles.InstallHomebrew(p, verbose)
+	dotfiles.InstallNvim(p, verbose)
 	dotfiles.InstallZsh(p)
-	dotfiles.InstallEmacs(p)
+	dotfiles.InstallEmacs(p, verbose)
 }
 
 func init() {

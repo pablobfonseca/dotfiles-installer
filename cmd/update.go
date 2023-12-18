@@ -1,7 +1,7 @@
 package cmd
 
 import (
-	updaters "github.com/pablobfonseca/dotfiles-cli/src/updaters"
+	updaters "github.com/pablobfonseca/dotfiles/src/updaters"
 	"github.com/spf13/cobra"
 	"github.com/vbauerster/mpb/v7"
 )
@@ -21,11 +21,11 @@ var updateCmd = &cobra.Command{
 		brew, _ := cmd.Flags().GetBool("brew")
 
 		if nvim {
-			updaters.UpdateNvim(p)
+			updaters.UpdateNvim(p, verbose)
 		}
 
 		if brew {
-			updaters.UpdateBrew(p)
+			updaters.UpdateBrew(p, verbose)
 		}
 
 		p.Wait()
