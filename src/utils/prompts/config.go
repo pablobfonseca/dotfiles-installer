@@ -29,34 +29,20 @@ type configData struct {
 	emacsConfigDir    string
 }
 
-type input struct {
-	icon        string
-	placeholder string
-	value       string
-}
-
 type model struct {
 	focusIndex int
-	inputs     []input
+	inputs     []Input
 	textInputs []textinput.Model
 	config     configData
 	err        error
 }
 
-func newInput(icon, placeholder string) input {
-	return input{
-		icon:        icon,
-		placeholder: placeholder,
-		value:       "",
-	}
-}
-
 func ConfigPrompt() model {
-	inputs := []input{
-		newInput("\uf408", "repository (e.g, username/dotfiles)"),
-		newInput("\uebdf", "dotfiles directory (e.g, ~/.dotfiles)"),
-		newInput("\ue7c5", "config directory (e.g, ~/.config/nvim)"),
-		newInput("\ue632", "emacs config directory (e.g, ~/.emacs.d)"),
+	inputs := []Input{
+		NewInput("\uf408", "repository (e.g, username/dotfiles)", "pablobfonseca/dotfiles"),
+		NewInput("\uebdf", "dotfiles directory (e.g, ~/.dotfiles)", "~/.dotfiles"),
+		NewInput("\ue7c5", "config directory (e.g, ~/.config/nvim)", "~/.config/nvim"),
+		NewInput("\ue632", "emacs config directory (e.g, ~/.emacs.d)", "~/.emacs.d"),
 	}
 
 	textInputs := make([]textinput.Model, len(inputs))
@@ -64,7 +50,7 @@ func ConfigPrompt() model {
 		t := textinput.New()
 		t.Prompt = in.icon + " "
 		t.Placeholder = in.placeholder
-		t.Cursor.Style = noStyle
+		t.Cursor.Style = focusedStyle
 
 		if i == 0 {
 			t.Focus()
@@ -175,10 +161,10 @@ func (m model) View() string {
 }
 
 func (m *model) persistConfig() error {
-	m.config.repositoryUrl = m.inputs[0].value
-	m.config.dotfilesConfigDir = expandPath(m.inputs[1].value)
-	m.config.nvimConfigDir = expandPath(m.inputs[2].value)
-	m.config.emacsConfigDir = expandPath(m.inputs[3].value)
+	m.config.repositoryUrl = m.inputs[0].Value()
+	m.config.dotfilesConfigDir = expandPath(m.inputs[1].Value())
+	m.config.nvimConfigDir = expandPath(m.inputs[2].Value())
+	m.config.emacsConfigDir = expandPath(m.inputs[3].Value())
 
 	viper.Set("dotfiles.repository", m.config.repositoryUrl)
 	viper.Set("dotfiles.default_dir", m.config.dotfilesConfigDir)

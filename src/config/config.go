@@ -3,7 +3,7 @@ package config
 import "github.com/spf13/viper"
 
 func RepositoryUrl() string {
-	return viper.GetString("dotfiles.repository")
+	return "https://github.com/" + viper.GetString("dotfiles.repository")
 }
 
 func DotfilesConfigDir() string {
