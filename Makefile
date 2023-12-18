@@ -1,4 +1,4 @@
-APP_NAME := dotfiles-cli
+APP_NAME := dotfiles
 
 GOBASE := $(shell pwd)
 GOBIN := $(GOBASE)/bin

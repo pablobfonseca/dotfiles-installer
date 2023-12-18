@@ -3,14 +3,14 @@ package dotfiles
 import (
 	"log"
 
-	"github.com/pablobfonseca/dotfiles-cli/src/utils"
+	"github.com/pablobfonseca/dotfiles/src/utils"
 	"github.com/vbauerster/mpb/v7"
 )
 
-func UpdateNvim(p *mpb.Progress) {
+func UpdateNvim(p *mpb.Progress, verbose bool) {
 	updateBar := utils.NewBar("Updating nvim packages", 1, p)
 
-	if err := utils.ExecuteCommand("nvim", "+NvChadUpdate", "+qall"); err != nil {
+	if err := utils.ExecuteCommand(verbose, "nvim", "+NvChadUpdate", "+qall"); err != nil {
 		log.Fatal("Error updating nvim:", err)
 	}
 	updateBar.Increment()

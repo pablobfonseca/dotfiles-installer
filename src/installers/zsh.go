@@ -4,7 +4,8 @@ import (
 	"os"
 	"path"
 
-	"github.com/pablobfonseca/dotfiles-cli/src/utils"
+	"github.com/pablobfonseca/dotfiles/src/config"
+	"github.com/pablobfonseca/dotfiles/src/utils"
 	"github.com/vbauerster/mpb/v7"
 )
 
@@ -14,7 +15,7 @@ func InstallZsh(p *mpb.Progress) {
 	bar := utils.NewBar("Symlinking zsh files", 1, p)
 
 	for _, file := range []string{"zshrc", "zshenv"} {
-		src := path.Join(utils.DotfilesPath, "zsh", file)
+		src := path.Join(config.DotfilesConfigDir(), "zsh", file)
 		dest := path.Join(os.Getenv("HOME"), "."+file)
 
 		utils.InfoMessage("Syncing " + src + " to " + dest)
