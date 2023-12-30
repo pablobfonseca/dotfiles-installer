@@ -11,8 +11,9 @@ import (
 )
 
 var installCmd = &cobra.Command{
-	Use:   "install",
-	Short: "Install the dotfiles",
+	Use:     "install",
+	Short:   "Install the dotfiles",
+	Example: "dotfiles install",
 	Long: `Install the dotfiles. You can install all the dotfiles or just some of them.
     Example: dotfiles install --all
              dotfiles install --nvim
@@ -21,15 +22,11 @@ var installCmd = &cobra.Command{
 		p := mpb.New()
 
 		all, _ := cmd.Flags().GetBool("all")
-		nvim, _ := cmd.Flags().GetBool("nvim")
 		emacs, _ := cmd.Flags().GetBool("emacs")
 		zsh, _ := cmd.Flags().GetBool("zsh")
 
 		if all {
 			installAll(p)
-		}
-		if nvim {
-			dotfiles.InstallNvim(p, verbose)
 		}
 		if emacs {
 			dotfiles.InstallEmacs(p, verbose)
@@ -45,7 +42,6 @@ var installCmd = &cobra.Command{
 func installAll(p *mpb.Progress) {
 	dotfiles.CloneRepo(p, verbose)
 	dotfiles.InstallHomebrew(p, verbose)
-	dotfiles.InstallNvim(p, verbose)
 	dotfiles.InstallZsh(p)
 	dotfiles.InstallEmacs(p, verbose)
 }
@@ -54,7 +50,6 @@ func init() {
 	rootCmd.AddCommand(installCmd)
 
 	installCmd.Flags().BoolP("all", "a", false, "Install all the dotfiles")
-	installCmd.Flags().BoolP("nvim", "n", false, "Install nvim files")
 	installCmd.Flags().BoolP("emacs", "e", false, "Install emacs files")
 	installCmd.Flags().BoolP("zsh", "z", false, "Install zsh files")
 }
