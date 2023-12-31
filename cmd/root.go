@@ -8,7 +8,6 @@ import (
 	"path"
 
 	tea "github.com/charmbracelet/bubbletea"
-	"github.com/pablobfonseca/dotfiles/cmd/vim"
 	"github.com/pablobfonseca/dotfiles/src/utils"
 	"github.com/pablobfonseca/dotfiles/src/utils/prompts"
 	"github.com/spf13/cobra"
@@ -39,9 +38,6 @@ func init() {
 	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.dotfiles/config.toml)")
 	rootCmd.PersistentFlags().BoolVarP(&verbose, "verbose", "v", false, "verbose output")
 	rootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
-
-	// commands
-	rootCmd.AddCommand(vim.VimRootCmd)
 }
 
 func initConfig() {

@@ -7,41 +7,28 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/vbauerster/mpb/v7"
 
-	dotfiles "github.com/pablobfonseca/dotfiles/src/installers"
+	"github.com/pablobfonseca/dotfiles/cmd/emacs"
+	"github.com/pablobfonseca/dotfiles/cmd/vim"
+	"github.com/pablobfonseca/dotfiles/src/config"
+	"github.com/pablobfonseca/dotfiles/src/utils"
 )
 
 var uninstallCmd = &cobra.Command{
 	Use:   "uninstall",
 	Short: "Uninstall the dotfiles",
-	Long: `Uninstall the dotfiles. You can uninstall all the dotfiles or just some of them.
-    Example: dotfiles uninstall --nvim
-             dotfiles uninstall --emacs
-  `,
+	Long:  "Uninstall the dotfiles. You can uninstall all the dotfiles or just some of them.",
 	Run: func(cmd *cobra.Command, args []string) {
 		p := mpb.New()
 
-		all, _ := cmd.Flags().GetBool("all")
-		nvim, _ := cmd.Flags().GetBool("nvim")
-		emacs, _ := cmd.Flags().GetBool("emacs")
+		bar := utils.NewBar("Deleting dotfiles repo", 1, p)
 
-		if all {
-			uninstallAll(p)
+		if err := utils.ExecuteCommand(verbose, "rm", "-rf", config.DotfilesConfigDir()); err != nil {
+			utils.ErrorMessage("Error deleting the repository", err)
 		}
-		if nvim {
-			dotfiles.UninstallNvim(uninstallApp, p, verbose)
-		}
-		if emacs {
-			dotfiles.UninstallEmacs(uninstallApp, p, verbose)
-		}
+		bar.Increment()
 
 		p.Wait()
 	},
-}
-
-func uninstallAll(p *mpb.Progress) {
-	dotfiles.DeleteRepo(p, verbose)
-	dotfiles.UninstallNvim(uninstallApp, p, verbose)
-	dotfiles.UninstallEmacs(uninstallApp, p, verbose)
 }
 
 var uninstallApp bool
@@ -49,9 +36,8 @@ var uninstallApp bool
 func init() {
 	rootCmd.AddCommand(uninstallCmd)
 
-	uninstallCmd.Flags().BoolVarP(&uninstallApp, "prune", "p", false, "Also uninstall the app")
+	uninstallCmd.PersistentFlags().BoolVarP(&verbose, "verbose", "v", false, "Verbose output")
 
-	uninstallCmd.Flags().BoolP("all", "a", false, "Uninstall all dotfiles")
-	uninstallCmd.Flags().BoolP("nvim", "n", false, "Uninstall nvim files")
-	uninstallCmd.Flags().BoolP("emacs", "e", false, "Uninstall emacs files")
+	uninstallCmd.AddCommand(vim.UninstallVimCmd)
+	uninstallCmd.AddCommand(emacs.UninstallEmacsCmd)
 }

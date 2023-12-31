@@ -12,9 +12,9 @@ import (
 
 const NVCHAD_REPO = "https://github.com/NvChad/NvChad"
 
-var vimInstallCmd = &cobra.Command{
-	Use:   "install",
-	Short: "Install the vim files",
+var InstallVimCmd = &cobra.Command{
+	Use:   "vim",
+	Short: "Install vim files",
 	Run: func(cmd *cobra.Command, args []string) {
 		p := mpb.New()
 
