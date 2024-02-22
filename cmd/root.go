@@ -1,6 +1,3 @@
-/*
-Copyright © 2023 Pablo Fonseca <pablofonseca777@gmail.com>
-*/
 package cmd
 
 import (
@@ -35,7 +32,7 @@ var verbose bool
 
 func init() {
 	cobra.OnInitialize(initConfig)
-	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.dotfiles/config.toml)")
+	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.config/dotfiles/config.toml)")
 	rootCmd.PersistentFlags().BoolVarP(&verbose, "verbose", "v", false, "verbose output")
 	rootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 }
@@ -49,7 +46,16 @@ func initConfig() {
 			utils.ErrorMessage("Something went wrong", err)
 		}
 
-		viper.AddConfigPath(path.Join(home, ".dotfiles/"))
+		configDir := path.Join(home, ".config/", "dotfiles/")
+
+		if _, err := os.Stat(path.Join(home, ".config/", "dotfiles/")); os.IsNotExist(err) {
+			err := os.Mkdir(configDir, 0755)
+			if err != nil {
+				utils.ErrorMessage("Error creating the config dir", err)
+			}
+		}
+
+		viper.AddConfigPath(configDir)
 		viper.SetConfigType("toml")
 		viper.SetConfigName("config")
 	}
