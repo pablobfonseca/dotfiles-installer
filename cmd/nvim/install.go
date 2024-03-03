@@ -1,4 +1,4 @@
-package vim
+package nvim
 
 import (
 	"os"
@@ -10,11 +10,9 @@ import (
 	"github.com/vbauerster/mpb/v7"
 )
 
-const NVCHAD_REPO = "https://github.com/NvChad/NvChad"
-
-var InstallVimCmd = &cobra.Command{
-	Use:   "vim",
-	Short: "Install vim files",
+var InstallNvimCmd = &cobra.Command{
+	Use:   "nvim",
+	Short: "Install nvim files",
 	Run: func(cmd *cobra.Command, args []string) {
 		p := mpb.New()
 
@@ -23,11 +21,11 @@ var InstallVimCmd = &cobra.Command{
 		if utils.CommandExists("nvim") {
 			utils.SkipMessage("nvim already installed")
 		} else {
-			installNvimBar := utils.NewBar("Installing nvim", 1, p)
-			if err := utils.ExecuteCommand(verbose, "brew", "install", "neovim"); err != nil {
+			InstallNvimBar := utils.NewBar("Installing nvim", 1, p)
+			if err := utils.ExecuteCommand(verbose, "brew", "install", "nvim"); err != nil {
 				utils.ErrorMessage("Error installing nvim", err)
 			}
-			installNvimBar.Increment()
+			InstallNvimBar.Increment()
 		}
 
 		utils.CloneRepoIfNotExists(verbose)
@@ -36,20 +34,16 @@ var InstallVimCmd = &cobra.Command{
 			utils.SkipMessage("nvim files already exists")
 			return
 		}
-		installNvChadBar := utils.NewBar("Installing NvChad", 1, p)
-
-		if err := utils.ExecuteCommand(verbose, "git", "clone", "--depth", "1", NVCHAD_REPO, config.NvimConfigDir()); err != nil {
-			utils.ErrorMessage("Error cloning the repository", err)
-		}
-		installNvChadBar.Increment()
 
 		symlinkBar := utils.NewBar("Symlinking files", 1, p)
 
-		src := path.Join(config.DotfilesConfigDir(), "nvim", "custom")
-		dest := path.Join(config.NvimConfigDir(), "lua", "custom")
+		src := path.Join(config.DotfilesConfigDir(), "nvim")
+		dest := path.Join(config.NvimConfigDir())
 		if err := os.Symlink(src, dest); err != nil {
 			utils.ErrorMessage("Error creating symlink", err)
 		}
 		symlinkBar.Increment()
+
+		utils.SuccessMessage("nvim files synced")
 	},
 }

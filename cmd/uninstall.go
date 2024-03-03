@@ -5,7 +5,7 @@ import (
 	"github.com/vbauerster/mpb/v7"
 
 	"github.com/pablobfonseca/dotfiles/cmd/emacs"
-	"github.com/pablobfonseca/dotfiles/cmd/vim"
+	"github.com/pablobfonseca/dotfiles/cmd/nvim"
 	"github.com/pablobfonseca/dotfiles/src/config"
 	"github.com/pablobfonseca/dotfiles/src/utils"
 )
@@ -35,6 +35,6 @@ func init() {
 
 	uninstallCmd.PersistentFlags().BoolVarP(&verbose, "verbose", "v", false, "Verbose output")
 
-	uninstallCmd.AddCommand(vim.UninstallVimCmd)
+	uninstallCmd.AddCommand(nvim.UnInstallNvimCmd)
 	uninstallCmd.AddCommand(emacs.UninstallEmacsCmd)
 }

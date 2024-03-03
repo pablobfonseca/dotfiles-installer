@@ -1,4 +1,4 @@
-package vim
+package nvim
 
 import (
 	"github.com/pablobfonseca/dotfiles/src/config"
@@ -7,9 +7,9 @@ import (
 	"github.com/vbauerster/mpb/v7"
 )
 
-var UninstallVimCmd = &cobra.Command{
-	Use:   "vim",
-	Short: "Uninstall vim files",
+var UnInstallNvimCmd = &cobra.Command{
+	Use:   "nvim",
+	Short: "Uninstall nvim files",
 	Run: func(cmd *cobra.Command, args []string) {
 		p := mpb.New()
 
