@@ -4,14 +4,22 @@ import (
 	"github.com/pablobfonseca/dotfiles/src/config"
 )
 
-func CloneRepoIfNotExists(verbose bool) {
-	if DirExists(config.DotfilesConfigDir()) {
-		SkipMessage("Dotfiles directory already exists")
+func CloneRepoIfNotExists(verbose bool, repo, dest string) {
+	if repo == "" {
+		repo = config.RepositoryUrl()
+	}
+
+	if dest == "" {
+		dest = config.DotfilesConfigDir()
+	}
+
+	if DirExists(dest) {
+		SkipMessage("Clone destination already exists")
 		return
 	}
 
-	InfoMessage("Dotfiles directory does not exists, cloning...")
-	if err := ExecuteCommand(verbose, "git", "clone", config.RepositoryUrl(), config.DotfilesConfigDir()); err != nil {
+	InfoMessage("Cloning...")
+	if err := ExecuteCommand(verbose, "git", "clone", repo, dest); err != nil {
 		ErrorMessage("Error cloning the repository", err)
 	}
 }

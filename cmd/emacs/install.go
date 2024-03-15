@@ -1,9 +1,6 @@
 package emacs
 
 import (
-	"os"
-	"path"
-
 	"github.com/pablobfonseca/dotfiles/src/config"
 	"github.com/pablobfonseca/dotfiles/src/utils"
 	"github.com/spf13/cobra"
@@ -30,15 +27,6 @@ var InstallEmacsCmd = &cobra.Command{
 
 		}
 
-		utils.CloneRepoIfNotExists(verbose)
-
-		symlinkBar := utils.NewBar("Symlinking files", 1, p)
-
-		src := path.Join(config.DotfilesConfigDir(), "emacs.d")
-		dest := path.Join(config.EmacsConfigDir())
-		if err := os.Symlink(src, dest); err != nil {
-			utils.ErrorMessage("Error creating symlink", err)
-		}
-		symlinkBar.Increment()
+		utils.CloneRepoIfNotExists(verbose, config.EmacsRepositoryUrl(), config.EmacsConfigDir())
 	},
 }

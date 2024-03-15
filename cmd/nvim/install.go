@@ -28,7 +28,7 @@ var InstallNvimCmd = &cobra.Command{
 			InstallNvimBar.Increment()
 		}
 
-		utils.CloneRepoIfNotExists(verbose)
+		utils.CloneRepoIfNotExists(verbose, "", "")
 
 		if utils.DirExists(config.NvimConfigDir()) {
 			utils.SkipMessage("nvim files already exists")

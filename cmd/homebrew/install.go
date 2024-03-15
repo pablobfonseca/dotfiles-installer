@@ -3,6 +3,7 @@ package homebrew
 import (
 	"fmt"
 
+	"github.com/pablobfonseca/dotfiles/src/config"
 	"github.com/pablobfonseca/dotfiles/src/utils"
 	"github.com/spf13/cobra"
 	"github.com/vbauerster/mpb/v7"
@@ -16,10 +17,22 @@ var InstallHomebrewCmd = &cobra.Command{
 		verbose, _ := cmd.Flags().GetBool("verbose")
 		bar := utils.NewBar("Installing homebrew", 1, p)
 
-		if err := utils.ExecuteCommand(verbose, "/bin/bash", "-c", "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"); err != nil {
-			fmt.Println("Error installing homebrew:", err)
+		if utils.CommandExists("brew") {
+			utils.SkipMessage("Homebrew already installed")
+		} else {
+			if err := utils.ExecuteCommand(verbose, "/bin/bash", "-c", "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"); err != nil {
+				fmt.Println("Error installing homebrew:", err)
+				return
+			}
+			bar.Increment()
+		}
+
+		installPackagesBar := utils.NewBar("Installing packages", 1, p)
+		utils.InfoMessage("Installing packages...")
+		if err := utils.ExecuteCommand(verbose, "\\cat", config.DotfilesConfigDir(), "/homebrew", "|", "xargs", "brew", "install"); err != nil {
+			fmt.Println("Error installing packages:", err)
 			return
 		}
-		bar.Increment()
+		installPackagesBar.Increment()
 	},
 }

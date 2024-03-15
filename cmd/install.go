@@ -22,17 +22,16 @@ var installCmd = &cobra.Command{
 
 		if utils.DirExists(config.DotfilesConfigDir()) {
 			utils.SkipMessage("Dotfiles repo already exists")
-			return
+		} else {
+			bar := utils.NewBar("Cloning dotfiles repo", 1, p)
+
+			if err := utils.ExecuteCommand(verbose, "git", "clone", config.RepositoryUrl(), config.DotfilesConfigDir()); err != nil {
+				utils.ErrorMessage("Error cloning the repository", err)
+			}
+			bar.Increment()
+
+			p.Wait()
 		}
-
-		bar := utils.NewBar("Cloning dotfiles repo", 1, p)
-
-		if err := utils.ExecuteCommand(verbose, "git", "clone", config.RepositoryUrl(), config.DotfilesConfigDir()); err != nil {
-			utils.ErrorMessage("Error cloning the repository", err)
-		}
-		bar.Increment()
-
-		p.Wait()
 	},
 }
 
