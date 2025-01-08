@@ -1,6 +1,6 @@
 module github.com/pablobfonseca/dotfiles
 
-go 1.21.5
+go 1.23
 
 require (
 	github.com/charmbracelet/bubbles v0.17.1
