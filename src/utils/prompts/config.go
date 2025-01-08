@@ -26,7 +26,6 @@ type configData struct {
 	repositoryUrl     string
 	dotfilesConfigDir string
 	nvimConfigDir     string
-	emacsConfigDir    string
 }
 
 type model struct {
@@ -42,8 +41,6 @@ func ConfigPrompt() model {
 		NewInput("\uf408", "repository (e.g, username/dotfiles)", "pablobfonseca/dotfiles"),
 		NewInput("\uebdf", "dotfiles directory (e.g, ~/.dotfiles)", "~/.dotfiles"),
 		NewInput("\ue7c5", "config directory (e.g, ~/.config/nvim)", "~/.config/nvim"),
-		NewInput("\uf408", "emacs repository (e.g, username/emacs.d)", "pablobfonseca/emacs.d"),
-		NewInput("\ue632", "emacs config directory (e.g, ~/.emacs.d)", "~/.emacs.d"),
 	}
 
 	textInputs := make([]textinput.Model, len(inputs))
@@ -164,13 +161,10 @@ func (m *model) persistConfig() error {
 	m.config.dotfilesConfigDir = expandPath(m.inputs[1].Value())
 	m.config.nvimConfigDir = expandPath(m.inputs[2].Value())
 	m.config.repositoryUrl = m.inputs[3].Value()
-	m.config.emacsConfigDir = expandPath(m.inputs[4].Value())
 
 	viper.Set("dotfiles.repository", m.config.repositoryUrl)
-	viper.Set("dotfiles.emacs_repository", m.config.repositoryUrl)
 	viper.Set("dotfiles.default_dir", m.config.dotfilesConfigDir)
 	viper.Set("dotfiles.nvim.config_dir", m.config.nvimConfigDir)
-	viper.Set("dotfiles.emacs.config_dir", m.config.emacsConfigDir)
 
 	err := viper.SafeWriteConfig()
 	if err == nil {

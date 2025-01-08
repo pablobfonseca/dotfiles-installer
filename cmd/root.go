@@ -28,12 +28,10 @@ func Execute() {
 }
 
 var cfgFile = ""
-var verbose bool
 
 func init() {
 	cobra.OnInitialize(initConfig)
 	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.config/dotfiles/config.toml)")
-	rootCmd.PersistentFlags().BoolVarP(&verbose, "verbose", "v", false, "verbose output")
 	rootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 }
 

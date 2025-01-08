@@ -1,7 +1,6 @@
 package utils
 
 import (
-	"bytes"
 	"fmt"
 	"os"
 	"os/exec"
@@ -21,22 +20,14 @@ func DirExists(path string) bool {
 	return info.IsDir()
 }
 
-func ExecuteCommand(verbose bool, command string, args ...string) error {
-	var stdoutBuf, stderrBuf bytes.Buffer
+func ExecuteCommand(command string, args ...string) error {
 	cmd := exec.Command(command, args...)
-	cmd.Stdout = &stdoutBuf
-	cmd.Stderr = &stderrBuf
 	err := cmd.Run()
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
 
 	if err != nil {
 		fmt.Printf("Error executing command: %s %v | %v\n", command, args, err)
-		if verbose {
-			fmt.Println("Command output:", stderrBuf.String())
-		}
-	}
-
-	if verbose {
-		fmt.Println("Command output:", stdoutBuf.String())
 	}
 
 	return err

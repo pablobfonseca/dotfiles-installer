@@ -4,7 +4,7 @@ import (
 	"github.com/pablobfonseca/dotfiles/src/config"
 )
 
-func CloneRepoIfNotExists(verbose bool, repo, dest string) {
+func CloneRepoIfNotExists(repo, dest string) {
 	if repo == "" {
 		repo = config.RepositoryUrl()
 	}
@@ -19,7 +19,7 @@ func CloneRepoIfNotExists(verbose bool, repo, dest string) {
 	}
 
 	InfoMessage("Cloning...")
-	if err := ExecuteCommand(verbose, "git", "clone", repo, dest); err != nil {
+	if err := ExecuteCommand("git", "clone", repo, dest); err != nil {
 		ErrorMessage("Error cloning the repository", err)
 	}
 }
