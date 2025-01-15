@@ -25,7 +25,6 @@ var (
 type configData struct {
 	repositoryUrl     string
 	dotfilesConfigDir string
-	nvimConfigDir     string
 }
 
 type model struct {
@@ -40,7 +39,6 @@ func ConfigPrompt() model {
 	inputs := []Input{
 		NewInput("\uf408", "repository (e.g, username/dotfiles)", "pablobfonseca/dotfiles"),
 		NewInput("\uebdf", "dotfiles directory (e.g, ~/.dotfiles)", "~/.dotfiles"),
-		NewInput("\ue7c5", "config directory (e.g, ~/.config/nvim)", "~/.config/nvim"),
 	}
 
 	textInputs := make([]textinput.Model, len(inputs))
@@ -159,12 +157,9 @@ func (m model) View() string {
 func (m *model) persistConfig() error {
 	m.config.repositoryUrl = m.inputs[0].Value()
 	m.config.dotfilesConfigDir = expandPath(m.inputs[1].Value())
-	m.config.nvimConfigDir = expandPath(m.inputs[2].Value())
-	m.config.repositoryUrl = m.inputs[3].Value()
 
 	viper.Set("dotfiles.repository", m.config.repositoryUrl)
 	viper.Set("dotfiles.default_dir", m.config.dotfilesConfigDir)
-	viper.Set("dotfiles.nvim.config_dir", m.config.nvimConfigDir)
 
 	err := viper.SafeWriteConfig()
 	if err == nil {

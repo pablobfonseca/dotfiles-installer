@@ -1,7 +1,9 @@
 package nvim
 
 import (
-	"github.com/pablobfonseca/dotfiles/src/config"
+	"os"
+	"path"
+
 	"github.com/pablobfonseca/dotfiles/src/utils"
 	"github.com/spf13/cobra"
 )
@@ -10,6 +12,7 @@ var UnInstallNvimCmd = &cobra.Command{
 	Use:   "nvim",
 	Short: "Uninstall nvim files",
 	Run: func(cmd *cobra.Command, args []string) {
+		configDir, _ := os.UserConfigDir()
 		uninstallApp, _ := cmd.Flags().GetBool("uninstall-app")
 
 		if !utils.CommandExists("nvim") {
@@ -23,7 +26,7 @@ var UnInstallNvimCmd = &cobra.Command{
 			}
 		}
 
-		if err := utils.ExecuteCommand("rm", "-rf", config.NvimConfigDir()); err != nil {
+		if err := utils.ExecuteCommand("rm", "-rf", path.Join(configDir, "nvim")); err != nil {
 			utils.ErrorMessage("Error removing nvim files", err)
 		}
 	},

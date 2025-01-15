@@ -9,7 +9,3 @@ func RepositoryUrl() string {
 func DotfilesConfigDir() string {
 	return viper.GetString("dotfiles.default_dir")
 }
-
-func NvimConfigDir() string {
-	return viper.GetString("dotfiles.nvim.config_dir")
-}
