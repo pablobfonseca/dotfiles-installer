@@ -17,7 +17,7 @@ jobs:
           go-version: "1.23"
 
       - name: Go Build
-        run: go build .
+        run: go build -ldflags="-s -w" .
 
       - name: Deploy release
         uses: "marvinpinto/action-automatic-releases@latest"

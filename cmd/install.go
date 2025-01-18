@@ -40,6 +40,10 @@ var installCmd = &cobra.Command{
 			utils.ErrorMessage("[homebrew]: %v", err)
 		}
 
+		err = installer.InstallConfigFiles()
+		if err != nil {
+			utils.ErrorMessage("[config files]: error setting up the files", err)
+		}
 	},
 }
 
