@@ -33,7 +33,7 @@ var installCmd = &cobra.Command{
 		ui.ShowWelcome()
 
 		interactive, _ := cmd.Flags().GetBool("interactive")
-		
+
 		if interactive {
 			// Interactive mode with tool selection
 			tools := []ui.Tool{
@@ -75,7 +75,7 @@ func runStandardInstall() {
 	steps := []string{
 		"Setting up repository",
 		"Installing Homebrew",
-		"Setting up Zsh configuration", 
+		"Setting up Zsh configuration",
 		"Installing configuration files",
 		"Finalizing installation",
 	}
@@ -127,7 +127,7 @@ func runInteractiveInstall(selectedTools []ui.Tool) {
 	// Add selected tools
 	for _, tool := range selectedTools {
 		steps = append(steps, "Installing "+tool.Name)
-		
+
 		switch tool.Name {
 		case "Homebrew":
 			tasks = append(tasks, func() error { return installer.InstallHomebrew() })
@@ -142,7 +142,7 @@ func runInteractiveInstall(selectedTools []ui.Tool) {
 		case "Starship":
 			tasks = append(tasks, func() error { return installer.SetupStarship() })
 		case "Karabiner-Elements":
-			tasks = append(tasks, func() error { 
+			tasks = append(tasks, func() error {
 				if err := installer.InstallKarabiner(); err != nil {
 					return err
 				}
@@ -167,7 +167,7 @@ func runInteractiveInstall(selectedTools []ui.Tool) {
 
 func init() {
 	rootCmd.AddCommand(installCmd)
-	
+
 	installCmd.Flags().BoolP("interactive", "i", false, "run interactive installation with tool selection")
 	installCmd.Flags().BoolP("force", "f", false, "force overwrite existing files without confirmation")
 

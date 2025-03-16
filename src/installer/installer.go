@@ -11,6 +11,48 @@ import (
 
 const homebrewInstallUrl = "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 
+type Application struct {
+	name          string
+	src           string
+	dest          string
+	multipleFiles bool
+	files         []string
+}
+
+func NewApp(name, src, dest string, multipleFiles bool, files []string) *Application {
+	return &Application{
+		name:          name,
+		src:           src,
+		dest:          dest,
+		multipleFiles: multipleFiles,
+		files:         files,
+	}
+}
+
+func (a *Application) Install() error {
+	if a.multipleFiles {
+		for _, file := range a.files {
+			src := path.Join(config.DotfilesConfigDir(), a.name, file)
+
+			err := install(src, a.dest)
+			if err != nil {
+				return err
+			}
+		}
+
+	}
+
+	if len(a.files) > 0 {
+	}
+
+	err := install(a.src, a.dest)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func InstallHomebrew() error {
 	if utils.CommandExists("brew") {
 		utils.SkipMessage("Homebrew is already installed")
@@ -179,23 +221,22 @@ func SetupKarabiner() error {
 }
 
 func InstallConfigFiles() error {
-	err := SetupWezterm()
-	if err != nil {
-		return err
+	configDir, _ := os.UserConfigDir()
+	apps := []Application{
+		{name: "wezterm", src: path.Join(config.DotfilesConfigDir(), "wezterm"), dest: path.Join(configDir, "wezterm")},
+		{name: "starship", src: path.Join(config.DotfilesConfigDir(), "starship", "starship.toml"), dest: path.Join(configDir, "starship.toml")},
+		{name: "tmux", src: path.Join(config.DotfilesConfigDir(), "tmux"), dest: path.Join(configDir, "tmux")},
+		{name: "aerospace", src: path.Join(config.DotfilesConfigDir(), "aerospace", "aerospace.toml"), dest: path.Join(configDir, "aerospace.toml")},
 	}
-	err = SetupStarship()
-	if err != nil {
-		return err
+
+	for _, app := range apps {
+		err := app.Install()
+		if err != nil {
+			return err
+		}
 	}
-	err = SetupTmux()
-	if err != nil {
-		return err
-	}
-	err = SetupAerospace()
-	if err != nil {
-		return err
-	}
-	err = SetupGit()
+
+	err := SetupGit()
 	if err != nil {
 		return err
 	}
