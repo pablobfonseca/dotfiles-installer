@@ -5,8 +5,22 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
+	"os/user"
 	"strings"
 )
+
+var isDryRunFunc func() bool
+
+func SetDryRunChecker(f func() bool) {
+	isDryRunFunc = f
+}
+
+func IsDryRun() bool {
+	if isDryRunFunc != nil {
+		return isDryRunFunc()
+	}
+	return false
+}
 
 func CommandExists(command string) bool {
 	_, err := exec.LookPath(command)
@@ -56,10 +70,13 @@ func ClearTerminal() {
 }
 
 func ExecuteCommand(command string, args ...string) error {
-	ClearTerminal()
+	if IsDryRun() {
+		fmt.Printf("[DRY RUN] Would execute: %s %s\n", command, strings.Join(args, " "))
+		return nil
+	}
+
 	cmd := exec.Command(command, args...)
-	var out strings.Builder
-	cmd.Stdout = &out
+	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
 	cmd.Stdin = os.Stdin
 
@@ -68,11 +85,15 @@ func ExecuteCommand(command string, args ...string) error {
 		return err
 	}
 
-	fmt.Print(out.String())
 	return nil
 }
 
 func SymlinkFiles(src, dest string) error {
+	if IsDryRun() {
+		fmt.Printf("[DRY RUN] Would create symlink: %s -> %s\n", dest, src)
+		return nil
+	}
+
 	if err := os.Symlink(src, dest); err != nil {
 		return err
 	}
@@ -92,4 +113,12 @@ func FindInOutput(output, query string) (bool, string) {
 	}
 
 	return false, ""
+}
+
+func GetCurrentUser() string {
+	currentUser, err := user.Current()
+	if err != nil {
+		return "unknown"
+	}
+	return currentUser.Username
 }
