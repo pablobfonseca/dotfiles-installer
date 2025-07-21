@@ -62,9 +62,9 @@ func pullFromRepo() error {
 }
 
 func stash(args ...string) error {
-	args = append(args, "stash")
+	stashArgs := append([]string{"stash"}, args...)
 
-	cmd := exec.Command("git", args...)
+	cmd := exec.Command("git", stashArgs...)
 	cmd.Dir = config.DotfilesConfigDir()
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr

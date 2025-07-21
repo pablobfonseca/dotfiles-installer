@@ -25,10 +25,11 @@ var InstallNvimCmd = &cobra.Command{
 
 		nvimDir := path.Join(configDir, "nvim")
 		if utils.DirExists(nvimDir) {
-			if utils.Confirm("Nvim files already exists, do you want to override them?") {
-				err := os.Remove(nvimDir)
+			if utils.ConfirmDestructive("Nvim files already exists, do you want to override them?") {
+				err := utils.RemoveAllFiles(nvimDir)
 				if err != nil {
 					utils.ErrorMessage("[dotfiles]: error removing dir", err)
+					return
 				}
 			} else {
 				utils.SkipMessage("nvim files already exists")

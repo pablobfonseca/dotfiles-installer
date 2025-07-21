@@ -5,6 +5,7 @@ import (
 	"path"
 
 	tea "github.com/charmbracelet/bubbletea"
+	"github.com/pablobfonseca/dotfiles/src/config"
 	"github.com/pablobfonseca/dotfiles/src/utils"
 	"github.com/pablobfonseca/dotfiles/src/utils/prompts"
 	"github.com/spf13/cobra"
@@ -14,8 +15,25 @@ import (
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
 	Use:   "dotfiles",
-	Short: "Install dotfiles from a git repository",
-	Long:  `dotfiles is a CLI tool to install dotfiles from a git repository.`,
+	Short: "🚀 Personal dotfiles installer",
+	Long: `🚀 Dotfiles Installer
+
+A CLI tool to manage your personal dotfiles and development environment setup.
+Install your favorite tools, configurations, and settings with an interactive terminal UI.
+
+Features:
+• 🔧 Interactive tool selection
+• 📊 Installation status tracking  
+• 🏃 Dry-run mode for safe testing
+• ⚙️  Configuration management
+• 🔄 Update and rollback capabilities
+
+Examples:
+  dotfiles install --interactive    # Interactive installation with tool selection
+  dotfiles install --dry-run       # Preview what would be installed
+  dotfiles status                   # Check installation status
+  dotfiles list                     # List available tools
+  dotfiles config                   # Show current configuration`,
 }
 
 // Execute adds all child commands to the root command and sets flags appropriately.
@@ -27,11 +45,17 @@ func Execute() {
 	}
 }
 
+func IsDryRun() bool {
+	return dryRun
+}
+
 var cfgFile = ""
+var dryRun = false
 
 func init() {
 	cobra.OnInitialize(initConfig)
 	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.config/dotfiles/config.toml)")
+	rootCmd.PersistentFlags().BoolVarP(&dryRun, "dry-run", "n", false, "show what would be done without executing")
 	rootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 }
 
@@ -46,8 +70,8 @@ func initConfig() {
 
 		configDir := path.Join(home, ".config/", "dotfiles/")
 
-		if _, err := os.Stat(path.Join(home, ".config/", "dotfiles/")); os.IsNotExist(err) {
-			err := os.Mkdir(configDir, 0755)
+		if _, err := os.Stat(configDir); os.IsNotExist(err) {
+			err := os.MkdirAll(configDir, 0755)
 			if err != nil {
 				utils.ErrorMessage("Error creating the config dir", err)
 			}
@@ -68,6 +92,11 @@ func initConfig() {
 
 		} else {
 			utils.ErrorMessage("Something went wrong", err)
+		}
+	} else {
+		// Validate config after reading
+		if err := config.ValidateConfig(); err != nil {
+			utils.ErrorMessage("Invalid configuration", err)
 		}
 	}
 }
