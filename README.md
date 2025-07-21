@@ -19,11 +19,44 @@ A CLI tool to manage your personal dotfiles and development environment setup wi
 
 ### Installation
 
+#### Option 1: Quick Install Script (Easiest)
+
 ```bash
-# Build from source
-git clone <this-repo>
+# One-liner install script (detects your OS/architecture)
+curl -fsSL https://raw.githubusercontent.com/pablobfonseca/dotfiles-installer/main/install.sh | bash
+```
+
+#### Option 2: Download Pre-built Binary
+
+```bash
+# Download the latest release for macOS (Intel)
+curl -L -o dotfiles https://github.com/pablobfonseca/dotfiles-installer/releases/latest/download/dotfiles-darwin-amd64
+
+# Make it executable
+chmod +x dotfiles
+
+# Move to your PATH (optional)
+sudo mv dotfiles /usr/local/bin/
+```
+
+**Available architectures:**
+- **macOS Intel**: `dotfiles-darwin-amd64`
+- **macOS Apple Silicon**: `dotfiles-darwin-arm64` 
+- **Linux x86_64**: `dotfiles-linux-amd64`
+- **Linux ARM64**: `dotfiles-linux-arm64`
+
+#### Option 3: Build from Source
+
+```bash
+# Clone the repository
+git clone https://github.com/pablobfonseca/dotfiles-installer.git
 cd dotfiles-installer
+
+# Build the binary
 go build -o dotfiles
+
+# Or use make
+make build
 ```
 
 ### Basic Usage
@@ -49,6 +82,25 @@ dotfiles config
 
 # Update your dotfiles
 dotfiles update --brew
+```
+
+### 🔧 Installation Notes
+
+- **macOS**: No additional dependencies required
+- **Linux**: Requires `curl` for downloading
+- **PATH**: The installer automatically tries to install to `/usr/local/bin` which should be in your PATH
+- **Permissions**: May require `sudo` for system-wide installation
+
+### 🚀 First Run
+
+After installation, run the setup:
+
+```bash
+# First time setup with interactive tool selection
+dotfiles install --interactive
+
+# Or install everything at once
+dotfiles install
 ```
 
 ## 🔧 Available Tools
@@ -166,6 +218,20 @@ go test ./...
 # Clean build artifacts
 make clean
 ```
+
+## 📦 Releases
+
+Pre-built binaries are automatically created for each release and available on the [GitHub Releases page](https://github.com/pablobfonseca/dotfiles-installer/releases).
+
+**Supported platforms:**
+- macOS (Intel & Apple Silicon)
+- Linux (x86_64 & ARM64)
+
+**Release artifacts:**
+- `dotfiles-darwin-amd64` - macOS Intel
+- `dotfiles-darwin-arm64` - macOS Apple Silicon  
+- `dotfiles-linux-amd64` - Linux x86_64
+- `dotfiles-linux-arm64` - Linux ARM64
 
 ## 🤝 Contributing
 
