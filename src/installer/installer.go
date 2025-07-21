@@ -122,7 +122,11 @@ func SetupTmux() error {
 	src := path.Join(config.DotfilesConfigDir(), "tmux")
 	dest := path.Join(configDir, "tmux")
 
-	return install(src, dest)
+	err := install(src, dest)
+
+	utils.CloneRepoIfNotExists("https://github.com/tmux-plugins/tmp", path.Join(dest, "plugins", "tmp"))
+
+	return err
 }
 
 func InstallConfigFiles() error {
