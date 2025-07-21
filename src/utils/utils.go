@@ -10,6 +10,8 @@ import (
 )
 
 var isDryRunFunc func() bool
+var isNonInteractiveMode bool = false
+var forceMode bool = false
 
 func SetDryRunChecker(f func() bool) {
 	isDryRunFunc = f
@@ -20,6 +22,22 @@ func IsDryRun() bool {
 		return isDryRunFunc()
 	}
 	return false
+}
+
+func SetNonInteractiveMode(nonInteractive bool) {
+	isNonInteractiveMode = nonInteractive
+}
+
+func IsNonInteractive() bool {
+	return isNonInteractiveMode
+}
+
+func SetForceMode(force bool) {
+	forceMode = force
+}
+
+func IsForceMode() bool {
+	return forceMode
 }
 
 func CommandExists(command string) bool {
@@ -37,6 +55,38 @@ func FileExists(path string) bool {
 }
 
 func Confirm(prompt string) bool {
+	return ConfirmWithDryRunBehavior(prompt, false)
+}
+
+// ConfirmDestructive should be used for operations that modify/delete files
+func ConfirmDestructive(prompt string) bool {
+	return ConfirmWithDryRunBehavior(prompt, true)
+}
+
+func ConfirmWithDryRunBehavior(prompt string, skipOnDryRun bool) bool {
+	// In force mode, always return true
+	if IsForceMode() {
+		InfoMessage(fmt.Sprintf("%s -> Forced (--force flag)", prompt))
+		return true
+	}
+
+	// In dry-run mode, handle based on operation type
+	if IsDryRun() {
+		if skipOnDryRun {
+			fmt.Printf("[DRY RUN] Would ask: %s -> Skipping destructive operation\n", prompt)
+			return false // Skip destructive operations in dry-run
+		} else {
+			fmt.Printf("[DRY RUN] Would ask: %s -> Simulating 'yes'\n", prompt)
+			return true // Simulate 'yes' for non-destructive operations
+		}
+	}
+
+	// In non-interactive mode (like TUI), default to 'yes' to avoid blocking
+	if IsNonInteractive() {
+		InfoMessage(fmt.Sprintf("%s -> Auto-confirmed (non-interactive mode)", prompt))
+		return true
+	}
+
 	reader := bufio.NewReader(os.Stdin)
 	for {
 		fmt.Printf("%s (y/n): ", prompt)
@@ -121,4 +171,17 @@ func GetCurrentUser() string {
 		return "unknown"
 	}
 	return currentUser.Username
+}
+
+func RemoveAllFiles(path string) error {
+	if IsDryRun() {
+		fmt.Printf("[DRY RUN] Would remove: %s\n", path)
+		return nil
+	}
+
+	if IsNonInteractive() {
+		InfoMessage("Removing existing file/directory: " + path)
+	}
+
+	return os.RemoveAll(path)
 }

@@ -104,6 +104,21 @@ func SetupZsh() error {
 		}
 	}
 
+	// Source the .zshrc file to apply changes immediately
+	zshrcPath := path.Join(home, ".zshrc")
+	if utils.FileExists(zshrcPath) {
+		utils.InfoMessage("Sourcing .zshrc to apply changes...")
+		
+		// Try to source the file - use a safer approach with exec
+		sourceCmd := fmt.Sprintf(". %s", zshrcPath)
+		if err := utils.ExecuteCommand("/bin/zsh", "-c", sourceCmd); err != nil {
+			// Don't fail the installation if sourcing fails, just provide helpful info
+			utils.InfoMessage("Note: Please restart your terminal or run 'source ~/.zshrc' to apply changes")
+		} else {
+			utils.SuccessMessage("✅ Zsh configuration loaded successfully!")
+		}
+	}
+
 	return nil
 }
 
@@ -129,6 +144,40 @@ func SetupTmux() error {
 	return err
 }
 
+func InstallKarabiner() error {
+	if !utils.CommandExists("karabiner_cli") {
+		utils.InfoMessage("Installing Karabiner-Elements...")
+		if err := utils.ExecuteCommand("brew", "install", "--cask", "karabiner-elements"); err != nil {
+			return err
+		}
+	} else {
+		utils.SkipMessage("Karabiner-Elements is already installed")
+	}
+	
+	return nil
+}
+
+func SetupKarabiner() error {
+	configDir, _ := os.UserConfigDir()
+	
+	// Karabiner config is typically in ~/.config/karabiner/
+	src := path.Join(config.DotfilesConfigDir(), "karabiner")
+	dest := path.Join(configDir, "karabiner")
+	
+	err := install(src, dest)
+	if err != nil {
+		return err
+	}
+	
+	// Restart Karabiner-Elements to load new configuration
+	utils.InfoMessage("Restarting Karabiner-Elements to load new configuration...")
+	if err := utils.ExecuteCommand("launchctl", "kickstart", "-k", "gui/$(id -u)/org.pqrs.karabiner.karabiner_console_user_server"); err != nil {
+		utils.InfoMessage("Note: Please restart Karabiner-Elements manually to load the new configuration")
+	}
+	
+	return nil
+}
+
 func InstallConfigFiles() error {
 	err := SetupWezterm()
 	if err != nil {
@@ -150,6 +199,14 @@ func InstallConfigFiles() error {
 	if err != nil {
 		return err
 	}
+	err = InstallKarabiner()
+	if err != nil {
+		return err
+	}
+	err = SetupKarabiner()
+	if err != nil {
+		return err
+	}
 
 	return err
 }
@@ -157,11 +214,15 @@ func InstallConfigFiles() error {
 func install(src, dest string) error {
 	utils.InfoMessage("Syncing " + src + " to " + dest)
 	if _, err := os.Stat(dest); err == nil {
-		if utils.Confirm(fmt.Sprintf("File %s already exists, do you want to replace it?", dest)) {
-			if err := os.Remove(dest); err != nil {
-				utils.ErrorMessage(fmt.Sprintf("[%s]: error symlinking file", src), err)
+		if utils.ConfirmDestructive(fmt.Sprintf("File %s already exists, do you want to replace it?", dest)) {
+			// Remove existing file or directory
+			if err := utils.RemoveAllFiles(dest); err != nil {
+				utils.ErrorMessage(fmt.Sprintf("[%s]: error removing existing file/directory", src), err)
+				return err
 			}
-			utils.SymlinkFiles(src, dest)
+			if err := utils.SymlinkFiles(src, dest); err != nil {
+				return err
+			}
 		} else {
 			utils.SkipMessage("File already exists: " + dest)
 		}

@@ -29,6 +29,7 @@ var listCmd = &cobra.Command{
 			{"Wezterm", "GPU-accelerated terminal emulator", "dotfiles install --interactive", utils.CommandExists("wezterm")},
 			{"Tmux", "Terminal multiplexer configuration", "dotfiles install --interactive", utils.CommandExists("tmux")},
 			{"Starship", "Cross-shell prompt configuration", "dotfiles install --interactive", utils.CommandExists("starship")},
+			{"Karabiner-Elements", "Keyboard customization tool", "dotfiles install karabiner", utils.CommandExists("karabiner_cli")},
 			{"Aerospace", "Window manager for macOS", "dotfiles install --interactive", utils.CommandExists("aerospace")},
 			{"Git Config", "Git configuration files", "dotfiles install --interactive", utils.FileExists("/Users/"+utils.GetCurrentUser()+"/.gitconfig")},
 		}

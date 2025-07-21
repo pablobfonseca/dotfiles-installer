@@ -37,6 +37,7 @@ var statusCmd = &cobra.Command{
 			{"Git", "git", path.Join(os.Getenv("HOME"), ".gitconfig")},
 			{"Tmux", "tmux", path.Join(os.Getenv("HOME"), ".config/tmux")},
 			{"Starship", "starship", path.Join(os.Getenv("HOME"), ".config/starship.toml")},
+			{"Karabiner-Elements", "karabiner_cli", path.Join(os.Getenv("HOME"), ".config/karabiner")},
 		}
 
 		fmt.Printf("\n%v Tool Status:\n\n", emoji.Information)

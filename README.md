@@ -60,6 +60,7 @@ dotfiles update --brew
 - **Tmux** - Terminal multiplexer configuration
 - **Starship** - Cross-shell prompt configuration
 - **Wezterm** - GPU-accelerated terminal emulator
+- **Karabiner-Elements** - Keyboard customization tool
 - **Aerospace** - Window manager for macOS
 
 ## 📖 Commands

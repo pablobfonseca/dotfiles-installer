@@ -8,7 +8,8 @@ import (
 
 var InstallZshCmd = &cobra.Command{
 	Use:   "zsh",
-	Short: "Install zsh files",
+	Short: "Install zsh configuration files and source them",
+	Long:  "Install zsh configuration files (.zshrc, .zprofile, .zlogin) and automatically source the .zshrc to apply changes immediately.",
 	Run: func(cmd *cobra.Command, args []string) {
 		err := installer.SetupZsh()
 		if err != nil {

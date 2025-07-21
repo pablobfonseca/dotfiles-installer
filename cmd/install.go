@@ -4,6 +4,7 @@ import (
 	"github.com/spf13/cobra"
 
 	"github.com/pablobfonseca/dotfiles/cmd/homebrew"
+	"github.com/pablobfonseca/dotfiles/cmd/karabiner"
 	"github.com/pablobfonseca/dotfiles/cmd/nvim"
 	"github.com/pablobfonseca/dotfiles/cmd/zsh"
 	"github.com/pablobfonseca/dotfiles/src/config"
@@ -23,6 +24,10 @@ var installCmd = &cobra.Command{
 			return dryRun
 		})
 
+		// Set force mode from flag
+		force, _ := cmd.Flags().GetBool("force")
+		utils.SetForceMode(force)
+
 		// Show banner
 		ui.ShowBanner()
 		ui.ShowWelcome()
@@ -38,6 +43,7 @@ var installCmd = &cobra.Command{
 				{Name: "Wezterm", Desc: "GPU-accelerated terminal emulator", Installed: utils.CommandExists("wezterm")},
 				{Name: "Tmux", Desc: "Terminal multiplexer configuration", Installed: utils.CommandExists("tmux")},
 				{Name: "Starship", Desc: "Cross-shell prompt configuration", Installed: utils.CommandExists("starship")},
+				{Name: "Karabiner-Elements", Desc: "Keyboard customization tool", Installed: utils.CommandExists("karabiner_cli")},
 				{Name: "Git Config", Desc: "Git configuration files", Installed: utils.FileExists("/Users/" + utils.GetCurrentUser() + "/.gitconfig")},
 			}
 
@@ -62,6 +68,10 @@ var installCmd = &cobra.Command{
 }
 
 func runStandardInstall() {
+	// Set non-interactive mode to prevent blocking prompts during TUI
+	utils.SetNonInteractiveMode(true)
+	defer utils.SetNonInteractiveMode(false)
+
 	steps := []string{
 		"Setting up repository",
 		"Installing Homebrew",
@@ -97,6 +107,10 @@ func runStandardInstall() {
 }
 
 func runInteractiveInstall(selectedTools []ui.Tool) {
+	// Set non-interactive mode to prevent blocking prompts during TUI
+	utils.SetNonInteractiveMode(true)
+	defer utils.SetNonInteractiveMode(false)
+
 	steps := make([]string, 0, len(selectedTools)+2)
 	tasks := make([]func() error, 0, len(selectedTools)+2)
 
@@ -127,6 +141,13 @@ func runInteractiveInstall(selectedTools []ui.Tool) {
 			tasks = append(tasks, func() error { return installer.SetupTmux() })
 		case "Starship":
 			tasks = append(tasks, func() error { return installer.SetupStarship() })
+		case "Karabiner-Elements":
+			tasks = append(tasks, func() error { 
+				if err := installer.InstallKarabiner(); err != nil {
+					return err
+				}
+				return installer.SetupKarabiner()
+			})
 		case "Git Config":
 			tasks = append(tasks, func() error { return installer.SetupGit() })
 		default:
@@ -148,8 +169,10 @@ func init() {
 	rootCmd.AddCommand(installCmd)
 	
 	installCmd.Flags().BoolP("interactive", "i", false, "run interactive installation with tool selection")
+	installCmd.Flags().BoolP("force", "f", false, "force overwrite existing files without confirmation")
 
 	installCmd.AddCommand(nvim.InstallNvimCmd)
 	installCmd.AddCommand(zsh.InstallZshCmd)
 	installCmd.AddCommand(homebrew.InstallHomebrewCmd)
+	installCmd.AddCommand(karabiner.InstallKarabinerCmd)
 }
