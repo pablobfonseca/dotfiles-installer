@@ -47,11 +47,7 @@ func CommandExists(command string) bool {
 
 func FileExists(path string) bool {
 	_, err := os.Stat(path)
-	if os.IsNotExist(err) {
-		return false
-	}
-
-	return true
+	return !os.IsNotExist(err)
 }
 
 func Confirm(prompt string) bool {
@@ -116,7 +112,7 @@ func DirExists(path string) bool {
 }
 
 func ClearTerminal() {
-	fmt.Print("\033[H\033[2J]]")
+	fmt.Print("\033[H\033[2J")
 }
 
 func ExecuteCommand(command string, args ...string) error {

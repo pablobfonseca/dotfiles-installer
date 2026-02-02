@@ -28,7 +28,7 @@ func UpdateRepository() error {
 		return err
 	}
 
-	if string(out[:]) == "" {
+	if len(out) == 0 {
 		if err := pullFromRepo(); err != nil {
 			return err
 		}

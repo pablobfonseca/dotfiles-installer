@@ -16,7 +16,6 @@ var (
 	focusedStyle = lipgloss.NewStyle().Foreground(lipgloss.Color("#00FFFF"))
 	blurredStyle = lipgloss.NewStyle().Foreground(lipgloss.Color("#008B8B"))
 	noStyle      = lipgloss.NewStyle()
-	helpStyle    = blurredStyle.Copy()
 
 	focusedButton = focusedStyle.Copy().Render("[ Submit ]")
 	blurredButton = fmt.Sprintf("[ %s ]", blurredStyle.Render("Submit"))
@@ -32,7 +31,6 @@ type model struct {
 	inputs     []Input
 	textInputs []textinput.Model
 	config     configData
-	err        error
 }
 
 func ConfigPrompt() model {

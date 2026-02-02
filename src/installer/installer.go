@@ -39,18 +39,10 @@ func (a *Application) Install() error {
 				return err
 			}
 		}
-
+		return nil
 	}
 
-	if len(a.files) > 0 {
-	}
-
-	err := install(a.src, a.dest)
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return install(a.src, a.dest)
 }
 
 func InstallHomebrew() error {
@@ -90,38 +82,37 @@ func InstallNvim() error {
 }
 
 func SetupStarship() error {
-	configDir, _ := os.UserConfigDir()
+	configDir, err := os.UserConfigDir()
+	if err != nil {
+		return fmt.Errorf("failed to get config directory: %w", err)
+	}
 
 	src := path.Join(config.DotfilesConfigDir(), "starship", "starship.toml")
 	dest := path.Join(configDir, "starship.toml")
 
-	err := install(src, dest)
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return install(src, dest)
 }
 
 func SetupAerospace() error {
-	configDir, _ := os.UserConfigDir()
+	configDir, err := os.UserConfigDir()
+	if err != nil {
+		return fmt.Errorf("failed to get config directory: %w", err)
+	}
 
 	src := path.Join(config.DotfilesConfigDir(), "aerospace", "aerospace.toml")
 	dest := path.Join(configDir, "aerospace.toml")
 
-	err := install(src, dest)
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return install(src, dest)
 }
 
 func SetupGit() error {
-	home, _ := os.UserHomeDir()
+	home, err := os.UserHomeDir()
+	if err != nil {
+		return fmt.Errorf("failed to get home directory: %w", err)
+	}
 
 	for _, file := range []string{"gitconfig", "gitignore", "global_ignore", "gitmessage"} {
-		src := path.Join(config.DotfilesConfigDir(), "zsh", file)
+		src := path.Join(config.DotfilesConfigDir(), "git", file)
 		dest := path.Join(home, "."+file)
 
 		err := install(src, dest)
@@ -134,7 +125,10 @@ func SetupGit() error {
 }
 
 func SetupZsh() error {
-	home, _ := os.UserHomeDir()
+	home, err := os.UserHomeDir()
+	if err != nil {
+		return fmt.Errorf("failed to get home directory: %w", err)
+	}
 
 	for _, file := range []string{"zshrc", "zprofile", "zlogin"} {
 		src := path.Join(config.DotfilesConfigDir(), "zsh", file)
@@ -150,7 +144,7 @@ func SetupZsh() error {
 	zshrcPath := path.Join(home, ".zshrc")
 	if utils.FileExists(zshrcPath) {
 		utils.InfoMessage("Sourcing .zshrc to apply changes...")
-		
+
 		// Try to source the file - use a safer approach with exec
 		sourceCmd := fmt.Sprintf(". %s", zshrcPath)
 		if err := utils.ExecuteCommand("/bin/zsh", "-c", sourceCmd); err != nil {
@@ -165,7 +159,10 @@ func SetupZsh() error {
 }
 
 func SetupWezterm() error {
-	configDir, _ := os.UserConfigDir()
+	configDir, err := os.UserConfigDir()
+	if err != nil {
+		return fmt.Errorf("failed to get config directory: %w", err)
+	}
 
 	src := path.Join(config.DotfilesConfigDir(), "wezterm")
 	dest := path.Join(configDir, "wezterm")
@@ -174,12 +171,15 @@ func SetupWezterm() error {
 }
 
 func SetupTmux() error {
-	configDir, _ := os.UserConfigDir()
+	configDir, err := os.UserConfigDir()
+	if err != nil {
+		return fmt.Errorf("failed to get config directory: %w", err)
+	}
 
 	src := path.Join(config.DotfilesConfigDir(), "tmux")
 	dest := path.Join(configDir, "tmux")
 
-	err := install(src, dest)
+	err = install(src, dest)
 
 	utils.CloneRepoIfNotExists("https://github.com/tmux-plugins/tmp", path.Join(dest, "plugins", "tmp"))
 
@@ -195,33 +195,37 @@ func InstallKarabiner() error {
 	} else {
 		utils.SkipMessage("Karabiner-Elements is already installed")
 	}
-	
+
 	return nil
 }
 
 func SetupKarabiner() error {
 	configDir, _ := os.UserConfigDir()
-	
+
 	// Karabiner config is typically in ~/.config/karabiner/
 	src := path.Join(config.DotfilesConfigDir(), "karabiner")
 	dest := path.Join(configDir, "karabiner")
-	
+
 	err := install(src, dest)
 	if err != nil {
 		return err
 	}
-	
+
 	// Restart Karabiner-Elements to load new configuration
 	utils.InfoMessage("Restarting Karabiner-Elements to load new configuration...")
 	if err := utils.ExecuteCommand("launchctl", "kickstart", "-k", "gui/$(id -u)/org.pqrs.karabiner.karabiner_console_user_server"); err != nil {
 		utils.InfoMessage("Note: Please restart Karabiner-Elements manually to load the new configuration")
 	}
-	
+
 	return nil
 }
 
 func InstallConfigFiles() error {
-	configDir, _ := os.UserConfigDir()
+	configDir, err := os.UserConfigDir()
+	if err != nil {
+		return fmt.Errorf("failed to get config directory: %w", err)
+	}
+
 	apps := []Application{
 		{name: "wezterm", src: path.Join(config.DotfilesConfigDir(), "wezterm"), dest: path.Join(configDir, "wezterm")},
 		{name: "starship", src: path.Join(config.DotfilesConfigDir(), "starship", "starship.toml"), dest: path.Join(configDir, "starship.toml")},
@@ -230,26 +234,21 @@ func InstallConfigFiles() error {
 	}
 
 	for _, app := range apps {
+		utils.InfoMessage("Installing %s", app.name)
 		err := app.Install()
 		if err != nil {
 			return err
 		}
+		utils.SuccessMessage(fmt.Sprintf("Installed %s", app.name))
 	}
 
-	err := SetupGit()
-	if err != nil {
+	utils.InfoMessage("Setting up Git")
+	if err = SetupGit(); err != nil {
 		return err
 	}
-	err = InstallKarabiner()
-	if err != nil {
-		return err
-	}
-	err = SetupKarabiner()
-	if err != nil {
-		return err
-	}
+	utils.SuccessMessage("Git setup complete")
 
-	return err
+	return nil
 }
 
 func install(src, dest string) error {
@@ -258,11 +257,10 @@ func install(src, dest string) error {
 		if utils.ConfirmDestructive(fmt.Sprintf("File %s already exists, do you want to replace it?", dest)) {
 			// Remove existing file or directory
 			if err := utils.RemoveAllFiles(dest); err != nil {
-				utils.ErrorMessage(fmt.Sprintf("[%s]: error removing existing file/directory", src), err)
-				return err
+				return fmt.Errorf("[%s]: error removing file: %w", src, err)
 			}
 			if err := utils.SymlinkFiles(src, dest); err != nil {
-				return err
+				return fmt.Errorf("[%s]: error symlinking file: %w", src, err)
 			}
 		} else {
 			utils.SkipMessage("File already exists: " + dest)

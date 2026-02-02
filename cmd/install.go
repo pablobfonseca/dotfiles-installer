@@ -11,6 +11,11 @@ import (
 	"github.com/pablobfonseca/dotfiles/src/installer"
 	"github.com/pablobfonseca/dotfiles/src/ui"
 	"github.com/pablobfonseca/dotfiles/src/utils"
+	"github.com/pablobfonseca/dotfiles/src/utils/prompts"
+)
+
+var (
+	useTUI bool
 )
 
 var installCmd = &cobra.Command{
@@ -19,6 +24,7 @@ var installCmd = &cobra.Command{
 	Example: "dotfiles install --interactive",
 	Long:    "Install the dotfiles with an interactive terminal UI. You can install all tools or select specific ones.",
 	Run: func(cmd *cobra.Command, args []string) {
+<<<<<<< HEAD
 		utils.SetDryRunChecker(func() bool {
 			dryRun, _ := cmd.Flags().GetBool("dry-run")
 			return dryRun
@@ -63,10 +69,30 @@ var installCmd = &cobra.Command{
 		} else {
 			// Standard installation with progress
 			runStandardInstall()
+||||||| parent of e3ac5fe (fix: bugs and improvements across codebase)
+		err := installer.SetupZsh()
+		if err != nil {
+			utils.ErrorMessage("[setup:zsh]:", err)
+=======
+		// Setup repository first regardless of TUI option
+		setupRepository()
+
+		if useTUI {
+			// Launch the TUI menu for installation
+			prompts.LaunchInstallerMenu()
+			return
+		}
+
+		// Legacy CLI flow if TUI is not requested
+		err := installer.SetupZsh()
+		if err != nil {
+			utils.ErrorMessage("[setup:zsh]:", err)
+>>>>>>> e3ac5fe (fix: bugs and improvements across codebase)
 		}
 	},
 }
 
+<<<<<<< HEAD
 func runStandardInstall() {
 	// Set non-interactive mode to prevent blocking prompts during TUI
 	utils.SetNonInteractiveMode(true)
@@ -161,12 +187,54 @@ func runInteractiveInstall(selectedTools []ui.Tool) {
 		ui.ShowSuccess("🎉 Selected tools installed successfully!")
 		return nil
 	})
+||||||| parent of e3ac5fe (fix: bugs and improvements across codebase)
+		if utils.DirExists(config.DotfilesConfigDir()) {
+			if utils.Confirm("Dotfiles already exists, do you want to check for updates?") {
+				if err := utils.UpdateRepository(); err != nil {
+					utils.ErrorMessage("[repo:update]: Error updating repository", err)
+				}
+			}
+		} else {
+			utils.InfoMessage("Cloning dotfiles repository")
+			if err := utils.ExecuteCommand("git", "clone", config.RepositoryUrl(), config.DotfilesConfigDir()); err != nil {
+				utils.ErrorMessage("[repo:clone]: Error cloning the repository", err)
+			}
+		}
+
+		err = installer.InstallHomebrew()
+		if err != nil {
+			utils.ErrorMessage("[homebrew]: %v", err)
+		}
+=======
+		err = installer.InstallHomebrew()
+		if err != nil {
+			utils.ErrorMessage("[homebrew]: %v", err)
+		}
+>>>>>>> e3ac5fe (fix: bugs and improvements across codebase)
 
 	ui.RunWithProgress(steps, tasks)
 }
 
+func setupRepository() {
+	if utils.DirExists(config.DotfilesConfigDir()) {
+		if utils.Confirm("Dotfiles already exists, do you want to check for updates?") {
+			if err := utils.UpdateRepository(); err != nil {
+				utils.ErrorMessage("[repo:update]: Error updating repository", err)
+			}
+		}
+	} else {
+		utils.InfoMessage("Cloning dotfiles repository")
+		if err := utils.ExecuteCommand("git", "clone", config.RepositoryUrl(), config.DotfilesConfigDir()); err != nil {
+			utils.ErrorMessage("[repo:clone]: Error cloning the repository", err)
+		}
+	}
+}
+
 func init() {
 	rootCmd.AddCommand(installCmd)
+	
+	// Add flag for TUI mode
+	installCmd.Flags().BoolVarP(&useTUI, "tui", "t", true, "Use terminal UI for installation")
 
 	installCmd.Flags().BoolP("interactive", "i", false, "run interactive installation with tool selection")
 	installCmd.Flags().BoolP("force", "f", false, "force overwrite existing files without confirmation")

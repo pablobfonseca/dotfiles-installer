@@ -13,13 +13,18 @@ var uninstallCmd = &cobra.Command{
 	Short: "Uninstall the dotfiles",
 	Long:  "Uninstall the dotfiles. You can uninstall all the dotfiles or just some of them.",
 	Run: func(cmd *cobra.Command, args []string) {
-		if err := utils.ExecuteCommand("rm", "-rf", config.DotfilesConfigDir()); err != nil {
+		dotfilesDir := config.DotfilesConfigDir()
+		if !utils.Confirm("Are you sure you want to delete " + dotfilesDir + "?") {
+			utils.SkipMessage("Uninstall cancelled")
+			return
+		}
+
+		if err := utils.ExecuteCommand("rm", "-rf", dotfilesDir); err != nil {
 			utils.ErrorMessage("Error deleting the repository", err)
 		}
+		utils.SuccessMessage("Dotfiles uninstalled successfully")
 	},
 }
-
-var uninstallApp bool
 
 func init() {
 	rootCmd.AddCommand(uninstallCmd)
