@@ -85,14 +85,14 @@ func NewInstallerMenu() Model {
 			installer:   installer.SetupStarship,
 		},
 		MenuItem{
-			title:       "Wezterm",
-			description: "Setup Wezterm terminal",
-			installer:   installer.SetupWezterm,
+			title:       "Ghostty",
+			description: "Setup Ghostty terminal",
+			installer:   installer.SetupGhostty,
 		},
 		MenuItem{
-			title:       "Aerospace",
-			description: "Setup Aerospace window manager",
-			installer:   installer.SetupAerospace,
+			title:       "Cyberpunk Theme",
+			description: "Install cyberpunk color theme",
+			installer:   installer.InstallCyberpunkTheme,
 		},
 		MenuItem{
 			title:       "Install All",

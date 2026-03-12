@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"os"
+	"path/filepath"
 
 	"github.com/spf13/cobra"
 
@@ -45,11 +46,12 @@ var installCmd = &cobra.Command{
 				{Name: "Homebrew", Desc: "Package manager for macOS", Installed: utils.CommandExists("brew")},
 				{Name: "Neovim", Desc: "Modern Vim-based text editor with config", Installed: utils.CommandExists("nvim")},
 				{Name: "Zsh", Desc: "Z shell configuration files", Installed: utils.FileExists(homeDir + "/.zshrc")},
-				{Name: "Wezterm", Desc: "GPU-accelerated terminal emulator", Installed: utils.CommandExists("wezterm")},
+				{Name: "Ghostty", Desc: "Fast, native terminal emulator", Installed: utils.CommandExists("ghostty")},
 				{Name: "Tmux", Desc: "Terminal multiplexer configuration", Installed: utils.CommandExists("tmux")},
 				{Name: "Starship", Desc: "Cross-shell prompt configuration", Installed: utils.CommandExists("starship")},
 				{Name: "Karabiner-Elements", Desc: "Keyboard customization tool", Installed: utils.CommandExists("karabiner_cli")},
 				{Name: "Git Config", Desc: "Git configuration files", Installed: utils.FileExists(homeDir + "/.gitconfig")},
+				{Name: "Cyberpunk Theme", Desc: "Cyberpunk color theme for terminal tools", Installed: utils.DirExists(filepath.Join(homeDir, ".cyberpunk-theme"))},
 			}
 
 			selectedTools, err := ui.RunToolSelector(tools)
@@ -129,8 +131,10 @@ func runInteractiveInstall(selectedTools []ui.Tool) {
 			tasks = append(tasks, func() error { return installer.InstallNvim() })
 		case "Zsh":
 			tasks = append(tasks, func() error { return installer.SetupZsh() })
-		case "Wezterm":
-			tasks = append(tasks, func() error { return installer.SetupWezterm() })
+		case "Ghostty":
+			tasks = append(tasks, func() error { return installer.SetupGhostty() })
+		case "Cyberpunk Theme":
+			tasks = append(tasks, func() error { return installer.InstallCyberpunkTheme() })
 		case "Tmux":
 			tasks = append(tasks, func() error { return installer.SetupTmux() })
 		case "Starship":

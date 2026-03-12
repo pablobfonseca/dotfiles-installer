@@ -260,7 +260,8 @@ func LaunchDashboard() {
 		{Name: "Tmux", Description: "Terminal multiplexer", Status: statusPending},
 		{Name: "Git", Description: "Version control", Status: statusPending},
 		{Name: "Starship", Description: "Shell prompt", Status: statusPending},
-		{Name: "Wezterm", Description: "Terminal emulator", Status: statusPending},
+		{Name: "Ghostty", Description: "Terminal emulator", Status: statusPending},
+		{Name: "Cyberpunk Theme", Description: "Color theme", Status: statusPending},
 	}
 
 	p := tea.NewProgram(NewDashboard(items), tea.WithAltScreen())

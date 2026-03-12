@@ -111,9 +111,9 @@ dotfiles install
 - **Git** - Git configuration files (.gitconfig, .gitignore, etc.)
 - **Tmux** - Terminal multiplexer configuration
 - **Starship** - Cross-shell prompt configuration
-- **Wezterm** - GPU-accelerated terminal emulator
+- **Ghostty** - Fast, native terminal emulator
 - **Karabiner-Elements** - Keyboard customization tool
-- **Aerospace** - Window manager for macOS
+- **Cyberpunk Theme** - Cyberpunk color theme for terminal tools
 
 ## 📖 Commands
 

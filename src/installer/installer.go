@@ -94,18 +94,6 @@ func SetupStarship() error {
 	return install(src, dest)
 }
 
-func SetupAerospace() error {
-	configDir, err := os.UserConfigDir()
-	if err != nil {
-		return fmt.Errorf("failed to get config directory: %w", err)
-	}
-
-	src := filepath.Join(config.DotfilesConfigDir(), "aerospace", "aerospace.toml")
-	dest := filepath.Join(configDir, "aerospace.toml")
-
-	return install(src, dest)
-}
-
 func SetupGit() error {
 	home, err := os.UserHomeDir()
 	if err != nil {
@@ -159,16 +147,33 @@ func SetupZsh() error {
 	return nil
 }
 
-func SetupWezterm() error {
+func SetupGhostty() error {
 	configDir, err := os.UserConfigDir()
 	if err != nil {
 		return fmt.Errorf("failed to get config directory: %w", err)
 	}
 
-	src := filepath.Join(config.DotfilesConfigDir(), "wezterm")
-	dest := filepath.Join(configDir, "wezterm")
+	src := filepath.Join(config.DotfilesConfigDir(), "ghostty")
+	dest := filepath.Join(configDir, "ghostty")
 
 	return install(src, dest)
+}
+
+func InstallCyberpunkTheme() error {
+	home, err := os.UserHomeDir()
+	if err != nil {
+		return fmt.Errorf("failed to get home directory: %w", err)
+	}
+
+	dest := filepath.Join(home, ".cyberpunk-theme")
+	utils.CloneRepoIfNotExists("https://github.com/pablobfonseca/cyberpunk-theme", dest)
+
+	installScript := filepath.Join(dest, "install.sh")
+	if !utils.FileExists(installScript) {
+		return fmt.Errorf("install script not found at %s", installScript)
+	}
+
+	return utils.ExecuteCommand("/bin/bash", installScript)
 }
 
 func SetupTmux() error {
@@ -237,10 +242,9 @@ func InstallConfigFiles() error {
 	}
 
 	apps := []Application{
-		{name: "wezterm", src: filepath.Join(config.DotfilesConfigDir(), "wezterm"), dest: filepath.Join(configDir, "wezterm")},
+		{name: "ghostty", src: filepath.Join(config.DotfilesConfigDir(), "ghostty"), dest: filepath.Join(configDir, "ghostty")},
 		{name: "starship", src: filepath.Join(config.DotfilesConfigDir(), "starship", "starship.toml"), dest: filepath.Join(configDir, "starship.toml")},
 		{name: "tmux", src: filepath.Join(config.DotfilesConfigDir(), "tmux"), dest: filepath.Join(configDir, "tmux")},
-		{name: "aerospace", src: filepath.Join(config.DotfilesConfigDir(), "aerospace", "aerospace.toml"), dest: filepath.Join(configDir, "aerospace.toml")},
 	}
 
 	for _, app := range apps {

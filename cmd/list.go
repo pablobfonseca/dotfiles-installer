@@ -30,12 +30,12 @@ var listCmd = &cobra.Command{
 			{"Homebrew", "Package manager for macOS", "dotfiles install homebrew", utils.CommandExists("brew")},
 			{"Neovim", "Modern Vim-based text editor with config", "dotfiles install nvim", utils.CommandExists("nvim")},
 			{"Zsh", "Z shell configuration files", "dotfiles install zsh", utils.FileExists(filepath.Join(home, ".zshrc"))},
-			{"Wezterm", "GPU-accelerated terminal emulator", "dotfiles install --interactive", utils.CommandExists("wezterm")},
+			{"Ghostty", "Fast, native terminal emulator", "dotfiles install --interactive", utils.CommandExists("ghostty")},
 			{"Tmux", "Terminal multiplexer configuration", "dotfiles install --interactive", utils.CommandExists("tmux")},
 			{"Starship", "Cross-shell prompt configuration", "dotfiles install --interactive", utils.CommandExists("starship")},
 			{"Karabiner-Elements", "Keyboard customization tool", "dotfiles install karabiner", utils.CommandExists("karabiner_cli")},
-			{"Aerospace", "Window manager for macOS", "dotfiles install --interactive", utils.CommandExists("aerospace")},
 			{"Git Config", "Git configuration files", "dotfiles install --interactive", utils.FileExists(filepath.Join(home, ".gitconfig"))},
+			{"Cyberpunk Theme", "Cyberpunk color theme for terminal tools", "dotfiles install --interactive", utils.DirExists(filepath.Join(home, ".cyberpunk-theme"))},
 		}
 
 		// Style definitions
