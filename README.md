@@ -12,7 +12,7 @@ A CLI tool to manage your personal dotfiles and development environment setup wi
 - 📊 **Installation Status Tracking** - See what's installed and what's not
 - 🏃 **Dry-run Mode** - Preview installations safely before executing
 - ⚙️ **Configuration Management** - Validate and manage your settings
-- 🔄 **Update & Rollback** - Keep your dotfiles current
+- 🔄 **Update** - Keep your dotfiles current
 - 🛡️ **Error Handling** - Robust error recovery and reporting
 
 ## 🚀 Quick Start
@@ -117,19 +117,31 @@ dotfiles install
 
 ## 📖 Commands
 
-| Command     | Description                           | Example                          |
-| ----------- | ------------------------------------- | -------------------------------- |
-| `install`   | Install dotfiles (interactive or all) | `dotfiles install --interactive` |
-| `list`      | Show available tools and status       | `dotfiles list`                  |
-| `status`    | Check installation status             | `dotfiles status`                |
-| `config`    | Show configuration settings           | `dotfiles config`                |
-| `update`    | Update repository and packages        | `dotfiles update --brew`         |
-| `uninstall` | Remove dotfiles                       | `dotfiles uninstall`             |
+| Command       | Description                               | Example                          |
+| ------------- | ----------------------------------------- | -------------------------------- |
+| `install`     | Install dotfiles (interactive or all)     | `dotfiles install --interactive` |
+| `list`        | Show available tools and status           | `dotfiles list`                  |
+| `status`      | Check installation status                 | `dotfiles status`                |
+| `config`      | Show configuration settings               | `dotfiles config`                |
+| `update`      | Update repository and packages            | `dotfiles update --brew`         |
+| `uninstall`   | Remove dotfiles                           | `dotfiles uninstall`             |
+| `dashboard`   | Launch interactive TUI monitoring dashboard | `dotfiles dashboard`           |
+
+### Subcommands
+
+| Command                         | Description                                        |
+| ------------------------------- | -------------------------------------------------- |
+| `dotfiles install nvim`         | Install Neovim and config                          |
+| `dotfiles install zsh`          | Install Zsh configuration                          |
+| `dotfiles install homebrew`     | Install Homebrew and packages                      |
+| `dotfiles install karabiner`    | Install Karabiner-Elements                         |
+| `dotfiles uninstall nvim`       | Uninstall Neovim config (`--uninstall-app` to also remove the app) |
 
 ### Command Options
 
 - `--interactive, -i` - Interactive installation with tool selection
 - `--dry-run, -n` - Preview mode (show what would be done)
+- `--force, -f` - Force overwrite existing files without confirmation
 - `--config` - Specify custom config file
 - `--brew` - Also update Homebrew packages (for update command)
 
@@ -190,11 +202,17 @@ On first run, you'll be prompted to configure:
 ```
 dotfiles-installer/
 ├── cmd/                    # CLI commands
+│   ├── homebrew/          # Homebrew subcommand
+│   ├── nvim/              # Neovim install/uninstall subcommands
+│   ├── zsh/               # Zsh subcommand
+│   ├── karabiner/         # Karabiner subcommand
 │   ├── install.go         # Install command with TUI
-│   ├── list.go           # List available tools
-│   ├── status.go         # Show status
-│   ├── config.go         # Configuration management
-│   └── update.go         # Update functionality
+│   ├── list.go            # List available tools
+│   ├── status.go          # Show status
+│   ├── config.go          # Configuration management
+│   ├── update.go          # Update functionality
+│   ├── uninstall.go       # Uninstall command
+│   └── dashboard.go       # Dashboard TUI command
 ├── src/
 │   ├── config/           # Configuration management
 │   ├── installer/        # Installation logic
