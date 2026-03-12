@@ -17,7 +17,7 @@ var (
 	blurredStyle = lipgloss.NewStyle().Foreground(lipgloss.Color("#008B8B"))
 	noStyle      = lipgloss.NewStyle()
 
-	focusedButton = focusedStyle.Copy().Render("[ Submit ]")
+	focusedButton = focusedStyle.Render("[ Submit ]")
 	blurredButton = fmt.Sprintf("[ %s ]", blurredStyle.Render("Submit"))
 )
 
@@ -70,7 +70,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case tea.KeyMsg:
 		switch msg.String() {
 		case "ctrl+c", "esc":
-			os.Exit(0)
+			return m, tea.Quit
 
 		case "tab", "shift+tab", "enter", "up", "down":
 			s := msg.String()
@@ -154,12 +154,16 @@ func (m model) View() string {
 
 func (m *model) persistConfig() error {
 	m.config.repositoryUrl = m.inputs[0].Value()
-	m.config.dotfilesConfigDir = expandPath(m.inputs[1].Value())
+	expanded, err := expandPath(m.inputs[1].Value())
+	if err != nil {
+		return err
+	}
+	m.config.dotfilesConfigDir = expanded
 
 	viper.Set("dotfiles.repository", m.config.repositoryUrl)
 	viper.Set("dotfiles.default_dir", m.config.dotfilesConfigDir)
 
-	err := viper.SafeWriteConfig()
+	err = viper.SafeWriteConfig()
 	if err == nil {
 		utils.SuccessMessage("Successfully created your config")
 	}
@@ -167,11 +171,13 @@ func (m *model) persistConfig() error {
 	return err
 }
 
-func expandPath(path string) string {
-	if !strings.HasPrefix(path, "~") {
-		return path
+func expandPath(p string) (string, error) {
+	if !strings.HasPrefix(p, "~") {
+		return p, nil
 	}
-
-	home, _ := os.UserHomeDir()
-	return strings.Replace(path, "~", home, 1)
+	home, err := os.UserHomeDir()
+	if err != nil {
+		return "", fmt.Errorf("failed to expand home directory: %w", err)
+	}
+	return strings.Replace(p, "~", home, 1), nil
 }

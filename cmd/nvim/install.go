@@ -3,7 +3,7 @@ package nvim
 import (
 	"log"
 	"os"
-	"path"
+	"path/filepath"
 
 	"github.com/pablobfonseca/dotfiles/src/config"
 	"github.com/pablobfonseca/dotfiles/src/installer"
@@ -15,15 +15,18 @@ var InstallNvimCmd = &cobra.Command{
 	Use:   "nvim",
 	Short: "Install nvim files",
 	Run: func(cmd *cobra.Command, args []string) {
-		configDir, _ := os.UserConfigDir()
-		err := installer.InstallNvim()
+		configDir, err := os.UserConfigDir()
+		if err != nil {
+			log.Fatalf("[nvim]: failed to get config directory: %v", err)
+		}
+		err = installer.InstallNvim()
 		if err != nil {
 			log.Fatalf("[nvim]: %v", err)
 		}
 
 		utils.CloneRepoIfNotExists(config.RepositoryUrl(), config.DotfilesConfigDir())
 
-		nvimDir := path.Join(configDir, "nvim")
+		nvimDir := filepath.Join(configDir, "nvim")
 		if utils.DirExists(nvimDir) {
 			if utils.ConfirmDestructive("Nvim files already exists, do you want to override them?") {
 				err := utils.RemoveAllFiles(nvimDir)
@@ -37,8 +40,8 @@ var InstallNvimCmd = &cobra.Command{
 			}
 		}
 
-		src := path.Join(config.DotfilesConfigDir(), "nvim")
-		dest := path.Join(configDir, "nvim")
+		src := filepath.Join(config.DotfilesConfigDir(), "nvim")
+		dest := filepath.Join(configDir, "nvim")
 		err = utils.SymlinkFiles(src, dest)
 		if err != nil {
 			utils.ErrorMessage("[dotfiles]: symlink error", err)

@@ -2,6 +2,8 @@ package cmd
 
 import (
 	"fmt"
+	"os"
+	"path/filepath"
 
 	"github.com/charmbracelet/lipgloss"
 	"github.com/enescakir/emoji"
@@ -17,6 +19,8 @@ var listCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		ui.ShowInfo("Available tools to install")
 
+		home, _ := os.UserHomeDir()
+
 		tools := []struct {
 			name        string
 			description string
@@ -25,13 +29,13 @@ var listCmd = &cobra.Command{
 		}{
 			{"Homebrew", "Package manager for macOS", "dotfiles install homebrew", utils.CommandExists("brew")},
 			{"Neovim", "Modern Vim-based text editor with config", "dotfiles install nvim", utils.CommandExists("nvim")},
-			{"Zsh", "Z shell configuration files", "dotfiles install zsh", utils.FileExists("/Users/"+utils.GetCurrentUser()+"/.zshrc")},
+			{"Zsh", "Z shell configuration files", "dotfiles install zsh", utils.FileExists(filepath.Join(home, ".zshrc"))},
 			{"Wezterm", "GPU-accelerated terminal emulator", "dotfiles install --interactive", utils.CommandExists("wezterm")},
 			{"Tmux", "Terminal multiplexer configuration", "dotfiles install --interactive", utils.CommandExists("tmux")},
 			{"Starship", "Cross-shell prompt configuration", "dotfiles install --interactive", utils.CommandExists("starship")},
 			{"Karabiner-Elements", "Keyboard customization tool", "dotfiles install karabiner", utils.CommandExists("karabiner_cli")},
 			{"Aerospace", "Window manager for macOS", "dotfiles install --interactive", utils.CommandExists("aerospace")},
-			{"Git Config", "Git configuration files", "dotfiles install --interactive", utils.FileExists("/Users/"+utils.GetCurrentUser()+"/.gitconfig")},
+			{"Git Config", "Git configuration files", "dotfiles install --interactive", utils.FileExists(filepath.Join(home, ".gitconfig"))},
 		}
 
 		// Style definitions

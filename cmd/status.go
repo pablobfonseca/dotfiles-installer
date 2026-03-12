@@ -3,7 +3,7 @@ package cmd
 import (
 	"fmt"
 	"os"
-	"path"
+	"path/filepath"
 
 	"github.com/enescakir/emoji"
 	"github.com/pablobfonseca/dotfiles/src/config"
@@ -33,11 +33,11 @@ var statusCmd = &cobra.Command{
 			configPath string
 		}{
 			{"Homebrew", "brew", ""},
-			{"Neovim", "nvim", path.Join(os.Getenv("HOME"), ".config/nvim")},
-			{"Git", "git", path.Join(os.Getenv("HOME"), ".gitconfig")},
-			{"Tmux", "tmux", path.Join(os.Getenv("HOME"), ".config/tmux")},
-			{"Starship", "starship", path.Join(os.Getenv("HOME"), ".config/starship.toml")},
-			{"Karabiner-Elements", "karabiner_cli", path.Join(os.Getenv("HOME"), ".config/karabiner")},
+			{"Neovim", "nvim", filepath.Join(os.Getenv("HOME"), ".config/nvim")},
+			{"Git", "git", filepath.Join(os.Getenv("HOME"), ".gitconfig")},
+			{"Tmux", "tmux", filepath.Join(os.Getenv("HOME"), ".config/tmux")},
+			{"Starship", "starship", filepath.Join(os.Getenv("HOME"), ".config/starship.toml")},
+			{"Karabiner-Elements", "karabiner_cli", filepath.Join(os.Getenv("HOME"), ".config/karabiner")},
 		}
 
 		fmt.Printf("\n%v Tool Status:\n\n", emoji.Information)

@@ -19,7 +19,7 @@ var uninstallCmd = &cobra.Command{
 			return
 		}
 
-		if err := utils.ExecuteCommand("rm", "-rf", dotfilesDir); err != nil {
+		if err := utils.RemoveAllFiles(dotfilesDir); err != nil {
 			utils.ErrorMessage("Error deleting the repository", err)
 		}
 		utils.SuccessMessage("Dotfiles uninstalled successfully")
@@ -29,5 +29,5 @@ var uninstallCmd = &cobra.Command{
 func init() {
 	rootCmd.AddCommand(uninstallCmd)
 
-	uninstallCmd.AddCommand(nvim.UnInstallNvimCmd)
+	uninstallCmd.AddCommand(nvim.UninstallNvimCmd)
 }

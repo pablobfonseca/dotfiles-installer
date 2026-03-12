@@ -174,7 +174,6 @@ func (m Model) View() string {
 		statusView = statusMessageStyle.Render(m.statusMsg)
 	case statusError:
 		statusView = statusMessageStyle.
-			Copy().
 			Foreground(lipgloss.Color("#FFFFFF")).
 			Background(lipgloss.Color("#FF0000")).
 			Render(m.statusMsg)

@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"fmt"
 	"os"
 	"os/exec"
 
@@ -20,6 +21,11 @@ func CloneRepoIfNotExists(repo, dest string) {
 }
 
 func UpdateRepository() error {
+	if IsDryRun() {
+		fmt.Printf("[DRY RUN] Would update repository at %s\n", config.DotfilesConfigDir())
+		return nil
+	}
+
 	cmd := exec.Command("git", "status", "--short")
 	cmd.Dir = config.DotfilesConfigDir()
 

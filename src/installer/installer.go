@@ -3,7 +3,8 @@ package installer
 import (
 	"fmt"
 	"os"
-	"path"
+	"os/user"
+	"path/filepath"
 
 	"github.com/pablobfonseca/dotfiles/src/config"
 	"github.com/pablobfonseca/dotfiles/src/utils"
@@ -32,7 +33,7 @@ func NewApp(name, src, dest string, multipleFiles bool, files []string) *Applica
 func (a *Application) Install() error {
 	if a.multipleFiles {
 		for _, file := range a.files {
-			src := path.Join(config.DotfilesConfigDir(), a.name, file)
+			src := filepath.Join(config.DotfilesConfigDir(), a.name, file)
 
 			err := install(src, a.dest)
 			if err != nil {
@@ -66,7 +67,7 @@ func InstallHomebrew() error {
 
 func installBrewPackages() error {
 	utils.InfoMessage("Installing brew packages...")
-	if err := utils.ExecuteCommand("brew", "bundle", fmt.Sprintf("--file=%s", path.Join(config.DotfilesConfigDir(), "/homebrew/Brewfile"))); err != nil {
+	if err := utils.ExecuteCommand("brew", "bundle", fmt.Sprintf("--file=%s", filepath.Join(config.DotfilesConfigDir(), "/homebrew/Brewfile"))); err != nil {
 		return err
 	}
 
@@ -87,8 +88,8 @@ func SetupStarship() error {
 		return fmt.Errorf("failed to get config directory: %w", err)
 	}
 
-	src := path.Join(config.DotfilesConfigDir(), "starship", "starship.toml")
-	dest := path.Join(configDir, "starship.toml")
+	src := filepath.Join(config.DotfilesConfigDir(), "starship", "starship.toml")
+	dest := filepath.Join(configDir, "starship.toml")
 
 	return install(src, dest)
 }
@@ -99,8 +100,8 @@ func SetupAerospace() error {
 		return fmt.Errorf("failed to get config directory: %w", err)
 	}
 
-	src := path.Join(config.DotfilesConfigDir(), "aerospace", "aerospace.toml")
-	dest := path.Join(configDir, "aerospace.toml")
+	src := filepath.Join(config.DotfilesConfigDir(), "aerospace", "aerospace.toml")
+	dest := filepath.Join(configDir, "aerospace.toml")
 
 	return install(src, dest)
 }
@@ -112,8 +113,8 @@ func SetupGit() error {
 	}
 
 	for _, file := range []string{"gitconfig", "gitignore", "global_ignore", "gitmessage"} {
-		src := path.Join(config.DotfilesConfigDir(), "git", file)
-		dest := path.Join(home, "."+file)
+		src := filepath.Join(config.DotfilesConfigDir(), "git", file)
+		dest := filepath.Join(home, "."+file)
 
 		err := install(src, dest)
 		if err != nil {
@@ -131,8 +132,8 @@ func SetupZsh() error {
 	}
 
 	for _, file := range []string{"zshrc", "zprofile", "zlogin"} {
-		src := path.Join(config.DotfilesConfigDir(), "zsh", file)
-		dest := path.Join(home, "."+file)
+		src := filepath.Join(config.DotfilesConfigDir(), "zsh", file)
+		dest := filepath.Join(home, "."+file)
 
 		err := install(src, dest)
 		if err != nil {
@@ -141,7 +142,7 @@ func SetupZsh() error {
 	}
 
 	// Source the .zshrc file to apply changes immediately
-	zshrcPath := path.Join(home, ".zshrc")
+	zshrcPath := filepath.Join(home, ".zshrc")
 	if utils.FileExists(zshrcPath) {
 		utils.InfoMessage("Sourcing .zshrc to apply changes...")
 
@@ -164,8 +165,8 @@ func SetupWezterm() error {
 		return fmt.Errorf("failed to get config directory: %w", err)
 	}
 
-	src := path.Join(config.DotfilesConfigDir(), "wezterm")
-	dest := path.Join(configDir, "wezterm")
+	src := filepath.Join(config.DotfilesConfigDir(), "wezterm")
+	dest := filepath.Join(configDir, "wezterm")
 
 	return install(src, dest)
 }
@@ -176,12 +177,12 @@ func SetupTmux() error {
 		return fmt.Errorf("failed to get config directory: %w", err)
 	}
 
-	src := path.Join(config.DotfilesConfigDir(), "tmux")
-	dest := path.Join(configDir, "tmux")
+	src := filepath.Join(config.DotfilesConfigDir(), "tmux")
+	dest := filepath.Join(configDir, "tmux")
 
 	err = install(src, dest)
 
-	utils.CloneRepoIfNotExists("https://github.com/tmux-plugins/tmp", path.Join(dest, "plugins", "tmp"))
+	utils.CloneRepoIfNotExists("https://github.com/tmux-plugins/tmp", filepath.Join(dest, "plugins", "tmp"))
 
 	return err
 }
@@ -200,20 +201,29 @@ func InstallKarabiner() error {
 }
 
 func SetupKarabiner() error {
-	configDir, _ := os.UserConfigDir()
+	configDir, err := os.UserConfigDir()
+	if err != nil {
+		return fmt.Errorf("failed to get config directory: %w", err)
+	}
 
 	// Karabiner config is typically in ~/.config/karabiner/
-	src := path.Join(config.DotfilesConfigDir(), "karabiner")
-	dest := path.Join(configDir, "karabiner")
+	src := filepath.Join(config.DotfilesConfigDir(), "karabiner")
+	dest := filepath.Join(configDir, "karabiner")
 
-	err := install(src, dest)
-	if err != nil {
+	if err := install(src, dest); err != nil {
 		return err
 	}
 
-	// Restart Karabiner-Elements to load new configuration
+	// Restart Karabiner-Elements to load new configuration.
+	// Resolve UID in Go instead of relying on shell expansion, which exec.Command does not perform.
+	currentUser, err := user.Current()
+	if err != nil {
+		utils.InfoMessage("Note: Please restart Karabiner-Elements manually to load the new configuration")
+		return nil
+	}
 	utils.InfoMessage("Restarting Karabiner-Elements to load new configuration...")
-	if err := utils.ExecuteCommand("launchctl", "kickstart", "-k", "gui/$(id -u)/org.pqrs.karabiner.karabiner_console_user_server"); err != nil {
+	launchctlTarget := fmt.Sprintf("gui/%s/org.pqrs.karabiner.karabiner_console_user_server", currentUser.Uid)
+	if err := utils.ExecuteCommand("launchctl", "kickstart", "-k", launchctlTarget); err != nil {
 		utils.InfoMessage("Note: Please restart Karabiner-Elements manually to load the new configuration")
 	}
 
@@ -227,10 +237,10 @@ func InstallConfigFiles() error {
 	}
 
 	apps := []Application{
-		{name: "wezterm", src: path.Join(config.DotfilesConfigDir(), "wezterm"), dest: path.Join(configDir, "wezterm")},
-		{name: "starship", src: path.Join(config.DotfilesConfigDir(), "starship", "starship.toml"), dest: path.Join(configDir, "starship.toml")},
-		{name: "tmux", src: path.Join(config.DotfilesConfigDir(), "tmux"), dest: path.Join(configDir, "tmux")},
-		{name: "aerospace", src: path.Join(config.DotfilesConfigDir(), "aerospace", "aerospace.toml"), dest: path.Join(configDir, "aerospace.toml")},
+		{name: "wezterm", src: filepath.Join(config.DotfilesConfigDir(), "wezterm"), dest: filepath.Join(configDir, "wezterm")},
+		{name: "starship", src: filepath.Join(config.DotfilesConfigDir(), "starship", "starship.toml"), dest: filepath.Join(configDir, "starship.toml")},
+		{name: "tmux", src: filepath.Join(config.DotfilesConfigDir(), "tmux"), dest: filepath.Join(configDir, "tmux")},
+		{name: "aerospace", src: filepath.Join(config.DotfilesConfigDir(), "aerospace", "aerospace.toml"), dest: filepath.Join(configDir, "aerospace.toml")},
 	}
 
 	for _, app := range apps {

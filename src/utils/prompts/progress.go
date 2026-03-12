@@ -78,6 +78,9 @@ func (m ProgressModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 func (m ProgressModel) View() string {
 	width := 50
+	if m.Total == 0 {
+		return fmt.Sprintf("%s\n%s\n%s", m.Description, progressTrackStyle.Render(strings.Repeat("█", width)), "No tasks")
+	}
 	done := int(float64(m.Current) / float64(m.Total) * float64(width))
 
 	bar := progressBarStyle.Render(strings.Repeat("█", done))

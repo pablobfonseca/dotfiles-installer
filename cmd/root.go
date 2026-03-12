@@ -2,7 +2,7 @@ package cmd
 
 import (
 	"os"
-	"path"
+	"path/filepath"
 
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/pablobfonseca/dotfiles/src/config"
@@ -45,17 +45,12 @@ func Execute() {
 	}
 }
 
-func IsDryRun() bool {
-	return dryRun
-}
-
 var cfgFile = ""
-var dryRun = false
 
 func init() {
 	cobra.OnInitialize(initConfig)
 	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.config/dotfiles/config.toml)")
-	rootCmd.PersistentFlags().BoolVarP(&dryRun, "dry-run", "n", false, "show what would be done without executing")
+	rootCmd.PersistentFlags().BoolP("dry-run", "n", false, "show what would be done without executing")
 }
 
 func initConfig() {
@@ -67,7 +62,7 @@ func initConfig() {
 			utils.ErrorMessage("Something went wrong", err)
 		}
 
-		configDir := path.Join(home, ".config/", "dotfiles/")
+		configDir := filepath.Join(home, ".config", "dotfiles")
 
 		if _, err := os.Stat(configDir); os.IsNotExist(err) {
 			err := os.MkdirAll(configDir, 0755)
