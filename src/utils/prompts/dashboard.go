@@ -2,6 +2,7 @@ package prompts
 
 import (
 	"fmt"
+	"io"
 	"os"
 	"time"
 
@@ -10,7 +11,6 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 	"github.com/pablobfonseca/dotfiles/src/installer"
-	"github.com/pablobfonseca/dotfiles/src/utils"
 )
 
 var (
@@ -271,8 +271,9 @@ func (m DashboardModel) updateInstalling(msg dashboardUpdateMsg) (tea.Model, tea
 	return m, m.startNextInstall()
 }
 
-// startNextInstall advances to the next item in the queue and launches its installer,
-// or transitions to phaseDone when the queue is exhausted.
+// startNextInstall advances to the next item in the queue and uses tea.Exec
+// to suspend the TUI, giving the installer full terminal access for prompts
+// and output. The TUI resumes when the installer returns.
 func (m *DashboardModel) startNextInstall() tea.Cmd {
 	if m.current >= len(m.queue) {
 		m.phase = phaseDone
@@ -289,14 +290,27 @@ func (m *DashboardModel) startNextInstall() tea.Cmd {
 	m.table.SetRows(rows)
 
 	installerFn := m.items[idx].Installer
-	return func() tea.Msg {
-		err := installerFn()
+	return tea.Exec(&installerExecCmd{fn: installerFn}, func(err error) tea.Msg {
 		if err != nil {
 			return dashboardUpdateMsg{index: idx, status: statusFailed, err: err}
 		}
 		return dashboardUpdateMsg{index: idx, status: statusSuccess}
-	}
+	})
 }
+
+// installerExecCmd wraps a Go function as a tea.ExecCommand so tea.Exec can
+// suspend the TUI and give the installer full terminal control.
+type installerExecCmd struct {
+	fn     func() error
+	stdin  io.Reader
+	stdout io.Writer
+	stderr io.Writer
+}
+
+func (c *installerExecCmd) SetStdin(r io.Reader)  { c.stdin = r }
+func (c *installerExecCmd) SetStdout(w io.Writer) { c.stdout = w }
+func (c *installerExecCmd) SetStderr(w io.Writer) { c.stderr = w }
+func (c *installerExecCmd) Run() error             { return c.fn() }
 
 // refreshRowStatus updates the Status cell for a single row to reflect its selection state.
 func (m *DashboardModel) refreshRowStatus(i int) {
@@ -361,10 +375,8 @@ func (m DashboardModel) View() string {
 }
 
 // LaunchDashboard starts the interactive TUI dashboard.
-// Non-interactive mode is set so installer prompts auto-confirm inside the TUI.
+// Each installer runs via tea.Exec which suspends the TUI, giving full terminal access.
 func LaunchDashboard() {
-	utils.SetNonInteractiveMode(true)
-
 	items := []DashboardItem{
 		{Name: "Homebrew", Description: "Package manager", Installer: installer.InstallHomebrew},
 		{Name: "Zsh", Description: "Shell configuration", Installer: installer.SetupZsh},

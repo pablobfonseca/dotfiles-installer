@@ -122,17 +122,6 @@ func ExecuteCommand(command string, args ...string) error {
 	}
 
 	cmd := exec.Command(command, args...)
-
-	// When running inside a TUI (non-interactive mode), capture output
-	// instead of piping to stdout which would corrupt the Bubbletea screen.
-	if IsNonInteractive() {
-		output, err := cmd.CombinedOutput()
-		if err != nil {
-			return fmt.Errorf("%s %v: %w\n%s", command, args, err, string(output))
-		}
-		return nil
-	}
-
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
 	cmd.Stdin = os.Stdin
