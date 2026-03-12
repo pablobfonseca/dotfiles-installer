@@ -122,13 +122,23 @@ func ExecuteCommand(command string, args ...string) error {
 	}
 
 	cmd := exec.Command(command, args...)
+
+	// When running inside a TUI (non-interactive mode), capture output
+	// instead of piping to stdout which would corrupt the Bubbletea screen.
+	if IsNonInteractive() {
+		output, err := cmd.CombinedOutput()
+		if err != nil {
+			return fmt.Errorf("%s %v: %w\n%s", command, args, err, string(output))
+		}
+		return nil
+	}
+
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
 	cmd.Stdin = os.Stdin
 
 	if err := cmd.Run(); err != nil {
-		fmt.Printf("Error executing command: %s %v | %v\n", command, args, err)
-		return err
+		return fmt.Errorf("%s %v: %w", command, args, err)
 	}
 
 	return nil
@@ -173,10 +183,6 @@ func RemoveAllFiles(path string) error {
 	if IsDryRun() {
 		fmt.Printf("[DRY RUN] Would remove: %s\n", path)
 		return nil
-	}
-
-	if IsNonInteractive() {
-		InfoMessage("Removing existing file/directory: " + path)
 	}
 
 	return os.RemoveAll(path)
