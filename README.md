@@ -23,7 +23,7 @@ A CLI tool to manage your personal dotfiles and development environment setup wi
 
 ```bash
 # One-liner install script (detects your OS/architecture)
-curl -fsSL https://raw.githubusercontent.com/pablobfonseca/dotfiles-installer/main/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/pablobfonseca/dotfiles-installer/master/install.sh | bash
 ```
 
 #### Option 2: Download Pre-built Binary
