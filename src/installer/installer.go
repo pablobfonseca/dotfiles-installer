@@ -166,7 +166,7 @@ func InstallCyberpunkTheme() error {
 	}
 
 	dest := filepath.Join(home, ".cyberpunk-theme")
-	utils.CloneRepoIfNotExists("https://github.com/pablobfonseca/cyberpunk-theme", dest)
+	utils.CloneRepoIfNotExists("git@github.com:pablobfonseca/cyberpunk-theme", dest)
 
 	installScript := filepath.Join(dest, "install.sh")
 	if !utils.FileExists(installScript) {
@@ -187,7 +187,7 @@ func SetupTmux() error {
 
 	err = install(src, dest)
 
-	utils.CloneRepoIfNotExists("https://github.com/tmux-plugins/tmp", filepath.Join(dest, "plugins", "tmp"))
+	utils.CloneRepoIfNotExists("git@github.com:tmux-plugins/tmp", filepath.Join(dest, "plugins", "tmp"))
 
 	return err
 }
