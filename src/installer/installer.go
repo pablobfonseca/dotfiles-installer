@@ -83,7 +83,7 @@ func InstallNvim() error {
 }
 
 func SetupStarship() error {
-	configDir, err := os.UserConfigDir()
+	configDir, err := config.ConfigDir()
 	if err != nil {
 		return fmt.Errorf("failed to get config directory: %w", err)
 	}
@@ -148,7 +148,7 @@ func SetupZsh() error {
 }
 
 func SetupGhostty() error {
-	configDir, err := os.UserConfigDir()
+	configDir, err := config.ConfigDir()
 	if err != nil {
 		return fmt.Errorf("failed to get config directory: %w", err)
 	}
@@ -177,7 +177,7 @@ func InstallCyberpunkTheme() error {
 }
 
 func SetupTmux() error {
-	configDir, err := os.UserConfigDir()
+	configDir, err := config.ConfigDir()
 	if err != nil {
 		return fmt.Errorf("failed to get config directory: %w", err)
 	}
@@ -206,7 +206,7 @@ func InstallKarabiner() error {
 }
 
 func SetupKarabiner() error {
-	configDir, err := os.UserConfigDir()
+	configDir, err := config.ConfigDir()
 	if err != nil {
 		return fmt.Errorf("failed to get config directory: %w", err)
 	}
@@ -236,7 +236,7 @@ func SetupKarabiner() error {
 }
 
 func InstallConfigFiles() error {
-	configDir, err := os.UserConfigDir()
+	configDir, err := config.ConfigDir()
 	if err != nil {
 		return fmt.Errorf("failed to get config directory: %w", err)
 	}

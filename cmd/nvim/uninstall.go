@@ -1,9 +1,9 @@
 package nvim
 
 import (
-	"os"
 	"path/filepath"
 
+	"github.com/pablobfonseca/dotfiles/src/config"
 	"github.com/pablobfonseca/dotfiles/src/utils"
 	"github.com/spf13/cobra"
 )
@@ -12,7 +12,7 @@ var UninstallNvimCmd = &cobra.Command{
 	Use:   "nvim",
 	Short: "Uninstall nvim files",
 	Run: func(cmd *cobra.Command, args []string) {
-		configDir, err := os.UserConfigDir()
+		configDir, err := config.ConfigDir()
 		if err != nil {
 			utils.ErrorMessage("Error getting config directory", err)
 			return

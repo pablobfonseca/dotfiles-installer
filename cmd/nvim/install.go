@@ -2,7 +2,6 @@ package nvim
 
 import (
 	"log"
-	"os"
 	"path/filepath"
 
 	"github.com/pablobfonseca/dotfiles/src/config"
@@ -15,7 +14,7 @@ var InstallNvimCmd = &cobra.Command{
 	Use:   "nvim",
 	Short: "Install nvim files",
 	Run: func(cmd *cobra.Command, args []string) {
-		configDir, err := os.UserConfigDir()
+		configDir, err := config.ConfigDir()
 		if err != nil {
 			log.Fatalf("[nvim]: failed to get config directory: %v", err)
 		}

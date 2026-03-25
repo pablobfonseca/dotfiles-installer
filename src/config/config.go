@@ -4,10 +4,25 @@ import (
 	"fmt"
 	"net/url"
 	"os"
+	"path/filepath"
 	"strings"
 
 	"github.com/spf13/viper"
 )
+
+// ConfigDir returns the user's config directory, preferring $XDG_CONFIG_HOME
+// over the default $HOME/.config. It avoids os.UserConfigDir intentionally
+// so that XDG_CONFIG_HOME is always respected on all platforms.
+func ConfigDir() (string, error) {
+	if xdg := os.Getenv("XDG_CONFIG_HOME"); xdg != "" {
+		return xdg, nil
+	}
+	home, err := os.UserHomeDir()
+	if err != nil {
+		return "", fmt.Errorf("getting home directory: %w", err)
+	}
+	return filepath.Join(home, ".config"), nil
+}
 
 func RepositoryUrl() string {
 	return "https://github.com/" + viper.GetString("dotfiles.repository")
