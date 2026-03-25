@@ -187,7 +187,7 @@ func SetupTmux() error {
 
 	err = install(src, dest)
 
-	utils.CloneRepoIfNotExists("git@github.com:tmux-plugins/tmp", filepath.Join(dest, "plugins", "tmp"))
+	utils.CloneRepoIfNotExists("https://github.com/tmux-plugins/tpm", filepath.Join(dest, "plugins", "tpm"))
 
 	return err
 }
