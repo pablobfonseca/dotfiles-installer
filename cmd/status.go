@@ -36,8 +36,10 @@ var statusCmd = &cobra.Command{
 			{"Neovim", "nvim", filepath.Join(os.Getenv("HOME"), ".config/nvim")},
 			{"Git", "git", filepath.Join(os.Getenv("HOME"), ".gitconfig")},
 			{"Tmux", "tmux", filepath.Join(os.Getenv("HOME"), ".config/tmux")},
+			{"Tmuxinator", "tmuxinator", filepath.Join(os.Getenv("HOME"), ".config/tmuxinator")},
 			{"Starship", "starship", filepath.Join(os.Getenv("HOME"), ".config/starship.toml")},
 			{"Karabiner-Elements", "karabiner_cli", filepath.Join(os.Getenv("HOME"), ".config/karabiner")},
+			{"Claude Code", "claude", ""},
 		}
 
 		fmt.Printf("\n%v Tool Status:\n\n", emoji.Information)

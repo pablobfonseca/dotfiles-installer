@@ -52,6 +52,7 @@ var installCmd = &cobra.Command{
 				{Name: "Karabiner-Elements", Desc: "Keyboard customization tool", Installed: utils.CommandExists("karabiner_cli")},
 				{Name: "Git Config", Desc: "Git configuration files", Installed: utils.FileExists(homeDir + "/.gitconfig")},
 				{Name: "Cyberpunk Theme", Desc: "Cyberpunk color theme for terminal tools", Installed: utils.DirExists(filepath.Join(homeDir, ".cyberpunk-theme"))},
+				{Name: "Claude Code", Desc: "Anthropic's AI coding assistant CLI", Installed: utils.CommandExists("claude")},
 			}
 
 			selectedTools, err := ui.RunToolSelector(tools)
@@ -148,6 +149,8 @@ func runInteractiveInstall(selectedTools []ui.Tool) {
 			})
 		case "Git Config":
 			tasks = append(tasks, func() error { return installer.SetupGit() })
+		case "Claude Code":
+			tasks = append(tasks, func() error { return installer.InstallClaudeCode() })
 		default:
 			tasks = append(tasks, func() error { return nil })
 		}

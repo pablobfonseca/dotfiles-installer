@@ -185,11 +185,28 @@ func SetupTmux() error {
 	src := filepath.Join(config.DotfilesConfigDir(), "tmux")
 	dest := filepath.Join(configDir, "tmux")
 
-	err = install(src, dest)
+	tmuxErr := install(src, dest)
 
 	utils.CloneRepoIfNotExists("https://github.com/tmux-plugins/tpm", filepath.Join(dest, "plugins", "tpm"))
 
-	return err
+	if tmuxErr != nil {
+		return tmuxErr
+	}
+
+	tmuxinatorSrc := filepath.Join(config.DotfilesConfigDir(), "tmuxinator")
+	tmuxinatorDest := filepath.Join(configDir, "tmuxinator")
+
+	return install(tmuxinatorSrc, tmuxinatorDest)
+}
+
+func InstallClaudeCode() error {
+	if utils.CommandExists("claude") {
+		utils.SkipMessage("Claude Code is already installed")
+		return nil
+	}
+
+	utils.InfoMessage("Installing Claude Code...")
+	return utils.ExecuteCommand("/bin/bash", "-c", "curl -fsSL https://claude.ai/install.sh | bash")
 }
 
 func InstallKarabiner() error {

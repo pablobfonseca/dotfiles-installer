@@ -36,6 +36,7 @@ var listCmd = &cobra.Command{
 			{"Karabiner-Elements", "Keyboard customization tool", "dotfiles install karabiner", utils.CommandExists("karabiner_cli")},
 			{"Git Config", "Git configuration files", "dotfiles install --interactive", utils.FileExists(filepath.Join(home, ".gitconfig"))},
 			{"Cyberpunk Theme", "Cyberpunk color theme for terminal tools", "dotfiles install --interactive", utils.DirExists(filepath.Join(home, ".cyberpunk-theme"))},
+			{"Claude Code", "Anthropic's AI coding assistant CLI", "dotfiles install --interactive", utils.CommandExists("claude")},
 		}
 
 		// Style definitions
